@@ -1,13 +1,20 @@
-package com.comp2042;
+package com.comp2042.controller;
+
+import com.comp2042.model.Board;
+import com.comp2042.model.ClearRow;
+import com.comp2042.model.DownData;
+import com.comp2042.view.ViewData;
 
 public class GameController implements InputEventListener {
 
-    private Board board = new SimpleBoard(25, 10);
+    private final Board board;
 
     private final GuiController viewGuiController;
 
-    public GameController(GuiController c) {
-        viewGuiController = c;
+    public GameController(GuiController c, Board board) {
+        this.viewGuiController = c;
+        this.board = board; // Now it's initialized
+
         board.createNewBrick();
         viewGuiController.setEventListener(this);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());

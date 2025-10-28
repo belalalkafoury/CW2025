@@ -1,4 +1,6 @@
-package com.comp2042;
+package com.comp2042.view;
+
+import com.comp2042.model.MatrixOperations;
 
 public final class NextShapeInfo {
 

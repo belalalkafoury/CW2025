@@ -1,5 +1,9 @@
-package com.comp2042;
+package com.comp2042.main;
 
+import com.comp2042.controller.GameController;
+import com.comp2042.controller.GuiController;
+import com.comp2042.model.Board;
+import com.comp2042.view.SimpleBoard;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +28,10 @@ public class Main extends Application {
         Scene scene = new Scene(root, 300, 510);
         primaryStage.setScene(scene);
         primaryStage.show();
-        new GameController(c);
+
+        Board board = new SimpleBoard(25, 10);
+
+        new GameController(c, board);
     }
 
 
