@@ -1,4 +1,4 @@
-package com.comp2042.model;
+package com.comp2042.logic.board;
 
 public final class ClearRow {
 

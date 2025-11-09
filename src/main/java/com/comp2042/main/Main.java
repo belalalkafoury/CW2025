@@ -3,7 +3,7 @@ package com.comp2042.main;
 import com.comp2042.controller.GameController;
 import com.comp2042.controller.GuiController;
 import com.comp2042.model.Board;
-import com.comp2042.view.SimpleBoard;
+import com.comp2042.model.GameBoard;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,7 +29,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        Board board = new SimpleBoard(25, 10);
+        Board board = new GameBoard(25, 10);
 
         new GameController(c, board);
     }

@@ -1,4 +1,4 @@
-package com.comp2042.model;
+package com.comp2042.logic.board;
 
 import com.comp2042.view.ViewData;
 

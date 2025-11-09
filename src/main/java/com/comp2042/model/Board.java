@@ -1,5 +1,6 @@
 package com.comp2042.model;
 
+import com.comp2042.logic.board.ClearRow;
 import com.comp2042.view.ViewData;
 
 public interface Board {
