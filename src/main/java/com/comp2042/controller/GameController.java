@@ -25,23 +25,13 @@ public class GameController implements InputEventListener {
     public DownData onDownEvent(MoveEvent event) {
         boolean canMove = board.moveBrickDown();
         ClearRow clearRow = null;
+
         if (!canMove) {
-            board.mergeBrickToBackground();
-            clearRow = board.clearRows();
-            if (clearRow.getLinesRemoved() > 0) {
-                board.getScore().add(clearRow.getScoreBonus());
-            }
-            if (board.createNewBrick()) {
-                viewGuiController.gameOver();
-            }
-
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-
+            clearRow = handleBrickLanding();
         } else {
-            if (event.getEventSource() == EventSource.USER) {
-                board.getScore().add(1);
-            }
+            updateScoreOnUserSoftDrop(event);
         }
+
         return new DownData(clearRow, board.getViewData());
     }
 
@@ -69,4 +59,23 @@ public class GameController implements InputEventListener {
         board.newGame();
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
     }
+    private ClearRow handleBrickLanding() {
+        board.mergeBrickToBackground();
+        ClearRow cleared = board.clearRows();
+        if (cleared.getLinesRemoved() > 0) {
+            board.getScore().add(cleared.getScoreBonus());
+        }
+        if (board.createNewBrick()) {
+            viewGuiController.gameOver();
+        }
+        viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        return cleared;
+    }
+
+    private void updateScoreOnUserSoftDrop(MoveEvent event) {
+        if (event.getEventSource() == EventSource.USER) {
+            board.getScore().add(1);
+        }
+    }
+
 }
