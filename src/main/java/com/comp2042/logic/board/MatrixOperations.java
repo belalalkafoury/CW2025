@@ -15,17 +15,20 @@ public class MatrixOperations {
     }
 
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
-        for (int i = 0; i < brick.length; i++) {
-            for (int j = 0; j < brick[i].length; j++) {
-                int targetX = x + i;
-                int targetY = y + j;
-                if (brick[j][i] != 0 && (checkOutOfBound(matrix, targetX, targetY) || matrix[targetY][targetX] != 0)) {
-                    return true;
+        for (int row = 0; row < brick.length; row++) {
+            for (int col = 0; col < brick[row].length; col++) {
+                if (brick[row][col] != 0) {
+                    int targetX = x + col;
+                    int targetY = y + row;
+                    if (checkOutOfBound(matrix, targetX, targetY) || matrix[targetX][targetY] != 0) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
+
 
     private static boolean checkOutOfBound(int[][] matrix, int targetX, int targetY) {
         boolean returnValue = true;

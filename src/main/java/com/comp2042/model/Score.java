@@ -18,4 +18,8 @@ public final class Score {
     public void reset() {
         score.setValue(0);
     }
+    public int getValue() {
+        return scoreProperty().get();
+    }
+
 }

@@ -13,7 +13,7 @@ import java.awt.*;
 
 public class GameBoard implements Board {
     private static final int START_X = 4;
-    private static final int START_Y = 10;
+    private static final int START_Y = 0;
     private final int width;
     private final int height;
     private final BrickGenerator brickGenerator;
@@ -74,7 +74,8 @@ public class GameBoard implements Board {
         Brick currentBrick = brickGenerator.getBrick();
         brickRotator.setBrick(currentBrick);
         currentOffset = new Point(START_X, START_Y);
-        return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
+        return !MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(),
+                (int) currentOffset.getX(), (int) currentOffset.getY());
     }
 
     @Override
