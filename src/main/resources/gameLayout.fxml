@@ -8,6 +8,12 @@
 <?import java.net.URL?>
 <Pane fx:controller="com.comp2042.controller.GuiController"
       xmlns:fx="http://javafx.com/fxml">
+    <Label fx:id="scoreLabel"
+           text="Score: 0"
+           layoutX="20"
+           layoutY="10"
+           style="-fx-font-size: 20px; -fx-text-fill: white;"/>
+
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
     <BorderPane styleClass="gameBoard" fx:id="gameBoard">
         <center>

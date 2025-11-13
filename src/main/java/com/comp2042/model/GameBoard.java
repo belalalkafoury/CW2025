@@ -5,8 +5,12 @@ import com.comp2042.logic.board.ClearRow;
 import com.comp2042.logic.board.MatrixOperations;
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickFactory;
+import com.comp2042.logic.bricks.OBrick;
 import com.comp2042.view.NextShapeInfo;
 import com.comp2042.view.ViewData;
+import com.comp2042.logic.board.rotation.NoRotationStrategy;
+import com.comp2042.logic.board.rotation.StandardRotationStrategy;
+
 
 import java.awt.*;
 
@@ -71,12 +75,19 @@ public class GameBoard implements Board {
 
     @Override
     public boolean createNewBrick() {
+
         if (nextBrick == null) {
             nextBrick = brickFactory.createRandomBrick();
         }
 
         currentBrick = nextBrick;
         nextBrick = brickFactory.createRandomBrick();
+
+        if (currentBrick instanceof OBrick) {
+            brickRotator.setRotationStrategy(new NoRotationStrategy());
+        } else {
+            brickRotator.setRotationStrategy(new StandardRotationStrategy());
+        }
 
         brickRotator.setBrick(currentBrick);
         currentOffset = new Point(START_X, START_Y);
@@ -88,6 +99,7 @@ public class GameBoard implements Board {
                 (int) currentOffset.getY()
         );
     }
+
 
 
     @Override
@@ -114,7 +126,6 @@ public class GameBoard implements Board {
 
     }
 
-    @Override
     public Score getScore() {
         return score;
     }
