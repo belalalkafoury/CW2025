@@ -17,10 +17,13 @@ public class MatrixOperations {
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
         for (int row = 0; row < brick.length; row++) {
             for (int col = 0; col < brick[row].length; col++) {
+
                 if (brick[row][col] != 0) {
-                    int targetX = x + col;
-                    int targetY = y + row;
-                    if (checkOutOfBound(matrix, targetX, targetY) || matrix[targetX][targetY] != 0) {
+                    int targetRow = y + row;
+                    int targetCol = x + col;
+
+                    if (checkOutOfBound(matrix, targetRow, targetCol) ||
+                            matrix[targetRow][targetCol] != 0) {
                         return true;
                     }
                 }
@@ -30,13 +33,12 @@ public class MatrixOperations {
     }
 
 
-    private static boolean checkOutOfBound(int[][] matrix, int targetX, int targetY) {
-        boolean returnValue = true;
-        if (targetX >= 0 && targetY < matrix.length && targetX < matrix[targetY].length) {
-            returnValue = false;
-        }
-        return returnValue;
+
+    private static boolean checkOutOfBound(int[][] matrix, int row, int col) {
+        return row < 0 || row >= matrix.length ||
+                col < 0 || col >= matrix[0].length;
     }
+
 
     public static int[][] copy(int[][] original) {
         int[][] myInt = new int[original.length][];

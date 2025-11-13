@@ -4,8 +4,7 @@ import com.comp2042.logic.board.BrickRotator;
 import com.comp2042.logic.board.ClearRow;
 import com.comp2042.logic.board.MatrixOperations;
 import com.comp2042.logic.bricks.Brick;
-import com.comp2042.logic.bricks.BrickGenerator;
-import com.comp2042.logic.bricks.RandomBrickGenerator;
+import com.comp2042.logic.bricks.BrickFactory;
 import com.comp2042.view.NextShapeInfo;
 import com.comp2042.view.ViewData;
 
@@ -16,17 +15,18 @@ public class GameBoard implements Board {
     private static final int START_Y = 0;
     private final int width;
     private final int height;
-    private final BrickGenerator brickGenerator;
     private final BrickRotator brickRotator;
     private int[][] currentGameMatrix;
     private Point currentOffset;
     private final Score score;
+    private final BrickFactory brickFactory = new BrickFactory();
+    private Brick currentBrick;
+    private Brick nextBrick;
 
     public GameBoard(int width, int height) {
         this.width = width;
         this.height = height;
         currentGameMatrix = new int[width][height];
-        brickGenerator = new RandomBrickGenerator();
         brickRotator = new BrickRotator();
         score = new Score();
     }
@@ -71,12 +71,24 @@ public class GameBoard implements Board {
 
     @Override
     public boolean createNewBrick() {
-        Brick currentBrick = brickGenerator.getBrick();
+        if (nextBrick == null) {
+            nextBrick = brickFactory.createRandomBrick();
+        }
+
+        currentBrick = nextBrick;
+        nextBrick = brickFactory.createRandomBrick();
+
         brickRotator.setBrick(currentBrick);
         currentOffset = new Point(START_X, START_Y);
-        return !MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(),
-                (int) currentOffset.getX(), (int) currentOffset.getY());
+
+        return !MatrixOperations.intersect(
+                currentGameMatrix,
+                brickRotator.getCurrentShape(),
+                (int) currentOffset.getX(),
+                (int) currentOffset.getY()
+        );
     }
+
 
     @Override
     public int[][] getBoardMatrix() {
@@ -85,7 +97,8 @@ public class GameBoard implements Board {
 
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0));
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextBrick.getShapeMatrix().get(0)
+        );
     }
 
     @Override
