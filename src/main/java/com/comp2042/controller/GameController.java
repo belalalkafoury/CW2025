@@ -1,5 +1,6 @@
 package com.comp2042.controller;
 
+import com.comp2042.logic.score.ScoreService;
 import com.comp2042.model.Board;
 import com.comp2042.logic.board.ClearRow;
 import com.comp2042.logic.board.DownData;
@@ -15,6 +16,9 @@ public class GameController implements InputEventListener {
 
     private final InputHandler inputHandler;
 
+    private final ScoreService scoreService;
+
+
 
     public GameController(GuiController c, Board board) {
         this.viewGuiController = c;
@@ -28,6 +32,7 @@ public class GameController implements InputEventListener {
         viewGuiController.bindScore(board.getScore().scoreProperty());
         this.animationController = new AnimationController(viewGuiController);
         this.animationController.start();
+        this.scoreService = new ScoreService(board.getScore());
     }
 
     @Override
@@ -81,9 +86,7 @@ public class GameController implements InputEventListener {
     private ClearRow handleBrickLanding() {
         board.mergeBrickToBackground();
         ClearRow cleared = board.clearRows();
-        if (cleared.getLinesRemoved() > 0) {
-            board.getScore().add(cleared.getScoreBonus());
-        }
+        scoreService.applyLineClearBonus(cleared);
         if (!board.createNewBrick()) {
             animationController.stop();
             viewGuiController.gameOver();
@@ -93,9 +96,8 @@ public class GameController implements InputEventListener {
     }
 
     private void updateScoreOnUserSoftDrop(MoveEvent event) {
-        if (event.getEventSource() == EventSource.USER) {
-            board.getScore().add(1);
-        }
+        scoreService.applySoftDrop(event);
     }
+
 
 }
