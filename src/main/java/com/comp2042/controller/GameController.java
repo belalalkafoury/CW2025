@@ -11,14 +11,23 @@ public class GameController implements InputEventListener {
 
     private final GuiController viewGuiController;
 
+    private final AnimationController animationController;
+
+    private final InputHandler inputHandler;
+
+
     public GameController(GuiController c, Board board) {
         this.viewGuiController = c;
         this.board = board; // Now it's initialized
 
         board.createNewBrick();
         viewGuiController.setEventListener(this);
+        this.inputHandler = new InputHandler(this);
+        viewGuiController.setInputHandler(this.inputHandler);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(board.getScore().scoreProperty());
+        this.animationController = new AnimationController(viewGuiController);
+        this.animationController.start();
     }
 
     @Override
@@ -30,34 +39,44 @@ public class GameController implements InputEventListener {
             clearRow = handleBrickLanding();
         } else {
             updateScoreOnUserSoftDrop(event);
+            viewGuiController.refreshBrick(board.getViewData());
         }
 
         return new DownData(clearRow, board.getViewData());
     }
 
+
+
     @Override
     public ViewData onLeftEvent(MoveEvent event) {
         board.moveBrickLeft();
+        viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
+
 
     @Override
     public ViewData onRightEvent(MoveEvent event) {
         board.moveBrickRight();
+        viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
+
 
     @Override
     public ViewData onRotateEvent(MoveEvent event) {
         board.rotateLeftBrick();
+        viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
+
 
 
     @Override
     public void createNewGame() {
         board.newGame();
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        animationController.start();
     }
     private ClearRow handleBrickLanding() {
         board.mergeBrickToBackground();
@@ -66,6 +85,7 @@ public class GameController implements InputEventListener {
             board.getScore().add(cleared.getScoreBonus());
         }
         if (!board.createNewBrick()) {
+            animationController.stop();
             viewGuiController.gameOver();
         }
         viewGuiController.refreshGameBackground(board.getBoardMatrix());

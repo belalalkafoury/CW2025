@@ -1,3 +1,4 @@
+
 package com.comp2042.model;
 
 import com.comp2042.logic.board.BrickRotator;
@@ -6,6 +7,7 @@ import com.comp2042.logic.board.MatrixOperations;
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickFactory;
 import com.comp2042.logic.bricks.OBrick;
+import com.comp2042.logic.collision.CollisionService;
 import com.comp2042.view.NextShapeInfo;
 import com.comp2042.view.ViewData;
 import com.comp2042.logic.board.rotation.NoRotationStrategy;
@@ -24,6 +26,7 @@ public class GameBoard implements Board {
     private Point currentOffset;
     private final Score score;
     private final BrickFactory brickFactory = new BrickFactory();
+    private final CollisionService collisionService = new CollisionService();
     private Brick currentBrick;
     private Brick nextBrick;
 
@@ -92,7 +95,7 @@ public class GameBoard implements Board {
         brickRotator.setBrick(currentBrick);
         currentOffset = new Point(START_X, START_Y);
 
-        return !MatrixOperations.intersect(
+        return collisionService.canPlaceAt(
                 currentGameMatrix,
                 brickRotator.getCurrentShape(),
                 (int) currentOffset.getX(),
@@ -144,9 +147,12 @@ public class GameBoard implements Board {
     }
 
     private boolean canPlaceAt(int[][] shape, Point p) {
-        boolean conflict = MatrixOperations.intersect(
-                currentGameMatrix, shape, (int) p.getX(), (int) p.getY());
-        return !conflict;
+        return collisionService.canPlaceAt(
+                currentGameMatrix,
+                shape,
+                (int) p.getX(),
+                (int) p.getY());
     }
+
 
 }
