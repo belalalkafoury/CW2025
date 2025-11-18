@@ -18,12 +18,14 @@ import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 import javafx.scene.control.Label;
+
 
 
 import java.net.URL;
@@ -47,6 +49,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private Label scoreLabel;
+
+    @FXML
+    private BorderPane gameBoard;
 
 
     private Rectangle[][] displayMatrix;
@@ -112,8 +117,10 @@ public class GuiController implements Initializable {
                 brickPanel.add(rectangle, j, i);
             }
         }
-        brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-        brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+        double gameBoardX = gameBoard.getLayoutX() + 12;
+        double gameBoardY = gameBoard.getLayoutY() + 12;
+        brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
+        brickPanel.setLayoutY(gameBoardY - 42 + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
 
     }
 
@@ -154,8 +161,10 @@ public class GuiController implements Initializable {
 
     public void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-            brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+            double gameBoardX = gameBoard.getLayoutX() + 12;
+            double gameBoardY = gameBoard.getLayoutY() + 12;
+            brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * (brickPanel.getVgap() + BRICK_SIZE));
+            brickPanel.setLayoutY(gameBoardY - 42 + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
