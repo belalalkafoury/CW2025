@@ -70,3 +70,54 @@
     -fx-fill: yellow;
     -fx-text-fill: yellow;
 }
+
+.panel-label {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.panel-border {
+    -fx-border-width: 2px;
+    -fx-border-color: white;
+    -fx-border-radius: 17px;
+    -fx-background-color: black;
+    -fx-background-radius: 17px;
+    -fx-padding: 10px;
+}
+.panel-grid {
+    -fx-hgap: 1px;
+    -fx-vgap: 1px;
+}
+
+.left-panel, .right-panel {
+    -fx-pref-width: 150px;
+}
+
+.stats-container {
+    -fx-padding: 15px;
+    -fx-spacing: 15px;
+}
+
+.stats-label {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.stats-value {
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 24px;
+    -fx-text-fill: yellow;
+}
+
+.next-pieces-container {
+    -fx-padding: 10px;
+    -fx-spacing: 15px;
+}
+
+.next-piece-container {
+    -fx-padding: 5px;
+}

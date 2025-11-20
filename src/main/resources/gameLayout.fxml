@@ -8,31 +8,74 @@
 <?import java.net.URL?>
 
 <Pane fx:controller="com.comp2042.controller.GuiController"
-      xmlns:fx="http://javafx.com/fxml">
+      xmlns:fx="http://javafx.com/fxml"
+      prefWidth="700" prefHeight="600">
 
-    <Label fx:id="scoreLabel"
-           text="Score: 0"
-           layoutX="20"
-           layoutY="10"
-           style="-fx-font-size: 20px; -fx-text-fill: white;"/>
+    <VBox alignment="TOP_CENTER" spacing="10" layoutX="30" layoutY="30" styleClass="left-panel">
+        <Label text="HOLD" styleClass="panel-label"/>
+        <BorderPane styleClass="panel-border">
+            <center>
+                <GridPane fx:id="holdPanel" vgap="1" hgap="1" styleClass="panel-grid"/>
+            </center>
+        </BorderPane>
+    </VBox>
 
-    <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
+    <VBox alignment="TOP_CENTER" spacing="10" layoutX="30" layoutY="180" styleClass="left-panel">
+        <BorderPane styleClass="panel-border">
+            <center>
+                <VBox alignment="CENTER" spacing="15" styleClass="stats-container">
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="SCORE" styleClass="stats-label"/>
+                        <Label fx:id="scoreLabel" text="0" styleClass="stats-value"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="LEVEL" styleClass="stats-label"/>
+                        <Label fx:id="levelLabel" text="1" styleClass="stats-value"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="5">
+                        <Label text="LINES" styleClass="stats-label"/>
+                        <Label fx:id="linesLabel" text="0" styleClass="stats-value"/>
+                    </VBox>
+                </VBox>
+            </center>
+        </BorderPane>
+    </VBox>
 
-    <BorderPane styleClass="gameBoard" fx:id="gameBoard">
+    <BorderPane styleClass="gameBoard" fx:id="gameBoard" 
+                layoutX="250" layoutY="50">
         <center>
             <GridPane fx:id="gamePanel"
                       hgap="1"
                       vgap="1"
-                      layoutY="30"
-                      layoutX="40"/>
+                      alignment="CENTER"/>
         </center>
     </BorderPane>
 
-    <Group fx:id="groupNotification" layoutX="14" layoutY="203">
+    <Group fx:id="groupNotification" layoutX="263.5" layoutY="303">
         <VBox alignment="CENTER">
             <GameOverPanel fx:id="gameOverPanel"/>
         </VBox>
     </Group>
+
+
+    <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
+
+
+    <VBox alignment="TOP_CENTER" spacing="10" layoutX="500" layoutY="30" styleClass="right-panel">
+        <Label text="NEXT" styleClass="panel-label"/>
+        <BorderPane styleClass="panel-border">
+            <center>
+                <VBox fx:id="nextPiecesContainer" alignment="CENTER" spacing="15" styleClass="next-pieces-container">
+                    <!-- Next piece will be added here dynamically -->
+                    <BorderPane fx:id="nextPiece1Container" styleClass="next-piece-container">
+                        <center>
+                            <GridPane fx:id="nextPiece1" vgap="1" hgap="1" styleClass="panel-grid"/>
+                        </center>
+                    </BorderPane>
+                </VBox>
+            </center>
+        </BorderPane>
+    </VBox>
 
     <stylesheets>
         <URL value="@window_style.css"/>
