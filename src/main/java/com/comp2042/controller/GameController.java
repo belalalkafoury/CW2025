@@ -31,8 +31,10 @@ public class GameController implements InputEventListener {
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.bindScore(board.getScore().scoreProperty());
         this.animationController = new AnimationController(viewGuiController);
+        viewGuiController.setAnimationController(this.animationController);
         this.animationController.start();
         this.scoreService = new ScoreService(board.getScore());
+        viewGuiController.bindLines(board.getScore().linesProperty());
     }
 
     @Override

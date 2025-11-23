@@ -74,6 +74,10 @@
         </BorderPane>
     </VBox>
 
+    <Button fx:id="pauseButton" text="⏸" onAction="#pauseGame" 
+            styleClass="pause-button"
+            layoutX="650" layoutY="550"/>
+
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>

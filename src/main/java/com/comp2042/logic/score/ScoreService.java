@@ -14,6 +14,7 @@ public class ScoreService {
 
     public void reset() {
         score.reset();
+        score.resetLines();
     }
 
     public void applySoftDrop(MoveEvent event) {
@@ -25,6 +26,7 @@ public class ScoreService {
     public void applyLineClearBonus(ClearRow cleared) {
         if (cleared != null && cleared.getLinesRemoved() > 0) {
             score.add(cleared.getScoreBonus());
+            score.addLines(cleared.getLinesRemoved());
         }
     }
 

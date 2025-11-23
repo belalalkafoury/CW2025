@@ -121,3 +121,23 @@
 .next-piece-container {
     -fx-padding: 5px;
 }
+
+.pause-button {
+    -fx-border-width: 2px;
+    -fx-border-color: white;
+    -fx-border-radius: 17px;
+    -fx-background-color: black;
+    -fx-background-radius: 17px;
+    -fx-text-fill: white;
+    -fx-font-family: "Let's go Digital";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 50px;
+    -fx-pref-height: 50px;
+    -fx-cursor: hand;
+}
+
+.pause-button:hover {
+    -fx-background-color: rgba(50, 50, 50, 0.9);
+    -fx-border-color: rgba(255, 255, 255, 0.9);
+}

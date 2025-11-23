@@ -83,6 +83,7 @@ public class GuiController implements Initializable {
 
     private InputHandler inputHandler;
 
+    private AnimationController animationController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -223,6 +224,31 @@ public class GuiController implements Initializable {
         scoreLabel.textProperty().bind(integerProperty.asString("%d"));
     }
 
+    public void bindLines(IntegerProperty integerProperty) {
+        linesLabel.textProperty().bind(integerProperty.asString("%d"));
+        
+        int initialLines = integerProperty.get();
+        int initialLevel = (initialLines / 10) + 1;
+        levelLabel.setText(String.valueOf(initialLevel));
+        if (animationController != null) {
+            animationController.updateSpeed(initialLevel);
+        }
+        
+        integerProperty.addListener((obs, oldVal, newVal) -> {
+            int lines = newVal.intValue();
+            int level = (lines / 10) + 1;
+            levelLabel.setText(String.valueOf(level));
+            
+            if (animationController != null) {
+                animationController.updateSpeed(level);
+            }
+        });
+    }
+
+    public void setAnimationController(AnimationController animationController) {
+        this.animationController = animationController;
+    }
+
     private void initNextPiecePanel(ViewData brick) {
         if (nextPiece1 == null || brick == null) return;
 
@@ -290,6 +316,12 @@ public class GuiController implements Initializable {
     }
 
     public void pauseGame(ActionEvent actionEvent) {
+        isPause.setValue(!isPause.getValue());
+        if (isPause.getValue()) {
+            pauseButton.setText("▶");
+        } else {
+            pauseButton.setText("⏸");
+        }
         gamePanel.requestFocus();
     }
     public void moveDownFromTimer() {

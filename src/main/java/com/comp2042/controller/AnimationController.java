@@ -10,20 +10,30 @@ public class AnimationController {
     private final GuiController guiController;
     private Timeline timeline;
 
-    private static final double DROP_SPEED_MILLIS = 400;
+    private static final double BASE_DROP_SPEED_MILLIS = 400;
+    private static final double MIN_DROP_SPEED_MILLIS = 50;
+    private static final double SPEED_INCREASE_PER_LEVEL = 25;
 
     public AnimationController(GuiController guiController) {
         this.guiController = guiController;
     }
 
     public void start() {
-        if (timeline == null) {
-            timeline = new Timeline(new KeyFrame(
-                    Duration.millis(DROP_SPEED_MILLIS),
-                    e -> guiController.moveDownFromTimer()
-            ));
-            timeline.setCycleCount(Timeline.INDEFINITE);
+        updateSpeed(1);
+    }
+
+    public void updateSpeed(int level) {
+        double dropSpeed = Math.max(MIN_DROP_SPEED_MILLIS, BASE_DROP_SPEED_MILLIS - (level - 1) * SPEED_INCREASE_PER_LEVEL);
+        
+        if (timeline != null) {
+            timeline.stop();
         }
+        
+        timeline = new Timeline(new KeyFrame(
+                Duration.millis(dropSpeed),
+                e -> guiController.moveDownFromTimer()
+        ));
+        timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
 
