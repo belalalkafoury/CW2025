@@ -1,20 +1,20 @@
 .root {
-    -fx-background-image: url("background_image.png");
+    -fx-background-image: url("background.png");
 }
 
-.nextBrick {
+.next-brick {
     -fx-border-width: 2px;
     -fx-border-color: whitesmoke;
     -fx-border-radius: 17px;
 }
 
-.gameBoard {
-    -fx-border-color: linear-gradient(#2A5058, #61a2b1);
+.game-board {
+    -fx-border-color: #4A9EFF;
     -fx-border-width: 12px;
     -fx-border-radius: 12px;
 }
 
-.nextBrickLabel {
+.next-brick-label {
     -fx-font-family: "Let's go Digital";
     -fx-padding: 20px 0 0 0;
     -fx-font-size: 16px;
@@ -80,9 +80,9 @@
 
 .panel-border {
     -fx-border-width: 2px;
-    -fx-border-color: white;
+    -fx-border-color: #5FAFFF;
     -fx-border-radius: 17px;
-    -fx-background-color: black;
+    -fx-background-color: rgba(0, 0, 0, 0.7);
     -fx-background-radius: 17px;
     -fx-padding: 10px;
 }
@@ -110,7 +110,7 @@
 .stats-value {
     -fx-font-family: "Let's go Digital";
     -fx-font-size: 24px;
-    -fx-text-fill: yellow;
+    -fx-text-fill: #6FCCFF;
 }
 
 .next-pieces-container {
@@ -124,9 +124,9 @@
 
 .pause-button {
     -fx-border-width: 2px;
-    -fx-border-color: white;
+    -fx-border-color: #5FAFFF;
     -fx-border-radius: 17px;
-    -fx-background-color: black;
+    -fx-background-color: rgba(0, 0, 0, 0.7);
     -fx-background-radius: 17px;
     -fx-text-fill: white;
     -fx-font-family: "Let's go Digital";
@@ -138,6 +138,29 @@
 }
 
 .pause-button:hover {
-    -fx-background-color: rgba(50, 50, 50, 0.9);
-    -fx-border-color: rgba(255, 255, 255, 0.9);
+    -fx-background-color: rgba(95, 175, 255, 0.2);
+    -fx-border-color: #6FCCFF;
+}
+
+.image-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0;
+    -fx-content-display: graphic-only;
+    -fx-cursor: hand;
+}
+
+.image-button .graphic {
+    -fx-background-color: transparent;
+}
+
+.image-button:hover {
+    -fx-opacity: 0.8;
+}
+
+.image-button:pressed {
+    -fx-opacity: 0.6;
 }
