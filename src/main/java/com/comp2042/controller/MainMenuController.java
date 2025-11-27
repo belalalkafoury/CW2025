@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -26,18 +27,30 @@ public class MainMenuController implements Initializable {
     @FXML
     private Button quitButton;
 
+    @FXML
+    private Pane animationContainer;
+
     private Stage primaryStage;
+    private MainMenuAnimationController animationController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        if (animationContainer != null) {
+            animationController = new MainMenuAnimationController(animationContainer);
+            animationController.start();
+        }
     }
 
     public void setPrimaryStage(Stage stage) {
         this.primaryStage = stage;
     }
-
+    
     @FXML
     private void startGame(ActionEvent event) {
+        if (animationController != null) {
+            animationController.stop();
+        }
+        
         try {
             URL location = getClass().getClassLoader().getResource("gameLayout.fxml");
             ResourceBundle resources = null;

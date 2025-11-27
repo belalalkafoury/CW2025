@@ -4,18 +4,14 @@ import com.comp2042.logic.board.DownData;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.NotificationPanel;
 import com.comp2042.view.ViewData;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -23,7 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.fxml.FXMLLoader;
@@ -336,14 +331,22 @@ public class GuiController implements Initializable {
     public void pauseGame(ActionEvent actionEvent) {
         isPause.setValue(!isPause.getValue());
         if (isPause.getValue()) {
-            pauseButton.setText("▶");
-            pauseMenuOverlay.setVisible(true);
+            if (pauseButton != null) {
+                pauseButton.setText("▶");
+            }
+            if (pauseMenuOverlay != null) {
+                pauseMenuOverlay.setVisible(true);
+            }
             if (animationController != null) {
                 animationController.pause();
             }
         } else {
-            pauseButton.setText("⏸");
-            pauseMenuOverlay.setVisible(false);
+            if (pauseButton != null) {
+                pauseButton.setText("⏸");
+            }
+            if (pauseMenuOverlay != null) {
+                pauseMenuOverlay.setVisible(false);
+            }
             if (animationController != null) {
                 animationController.resume();
             }
@@ -353,8 +356,12 @@ public class GuiController implements Initializable {
 
     public void resumeGame(ActionEvent actionEvent) {
         isPause.setValue(false);
-        pauseButton.setText("⏸");
-        pauseMenuOverlay.setVisible(false);
+        if (pauseButton != null) {
+            pauseButton.setText("⏸");
+        }
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(false);
+        }
         if (animationController != null) {
             animationController.resume();
         }
