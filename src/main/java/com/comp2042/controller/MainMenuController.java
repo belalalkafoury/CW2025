@@ -2,6 +2,7 @@ package com.comp2042.controller;
 
 import com.comp2042.model.Board;
 import com.comp2042.model.GameBoard;
+import com.comp2042.view.TetrisLogo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -11,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -29,6 +31,12 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private Pane animationContainer;
+
+    @FXML
+    private VBox logoContainer;
+
+    @FXML
+    private TetrisLogo tetrisLogo;
 
     private Stage primaryStage;
     private MainMenuAnimationController animationController;

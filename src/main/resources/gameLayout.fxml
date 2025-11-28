@@ -16,7 +16,7 @@
 
     <ImageView fitWidth="700" fitHeight="600" preserveRatio="false" pickOnBounds="true">
         <image>
-            <Image url="@background.png"/>
+            <Image url="@background_image.png"/>
         </image>
     </ImageView>
 
@@ -71,7 +71,7 @@
 
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
 
-    <VBox alignment="TOP_CENTER" spacing="10" layoutX="500" layoutY="30" styleClass="right-panel">
+    <VBox alignment="TOP_CENTER" spacing="10" layoutX="520" layoutY="30" styleClass="right-panel">
         <Label text="NEXT" styleClass="panel-label"/>
         <BorderPane styleClass="panel-border">
             <center>
@@ -86,9 +86,9 @@
         </BorderPane>
     </VBox>
 
-    <Button fx:id="pauseButton" text="⏸" onAction="#pauseGame" 
+    <Button fx:id="pauseButton" text="⏸" onAction="#pauseGame"
             styleClass="pause-button"
-            layoutX="650" layoutY="550"/>
+            layoutX="630" layoutY="530"/>
 
     <Group fx:id="pauseMenuOverlay" visible="false" layoutX="0" layoutY="0">
         <Rectangle width="700" height="600" styleClass="pause-dim-background"/>
