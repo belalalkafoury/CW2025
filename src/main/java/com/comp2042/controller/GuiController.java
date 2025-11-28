@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.control.Label;
@@ -47,6 +48,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private GameOverPanel gameOverPanel;
+    
+    @FXML
+    private Group gameOverOverlay;
 
     @FXML
     private Label scoreLabel;
@@ -77,6 +81,7 @@ public class GuiController implements Initializable {
 
     private Rectangle[][] nextPieceRectangles;
 
+    private boolean gridCreated = false;
 
     private final BooleanProperty isPause = new SimpleBooleanProperty();
 
@@ -116,13 +121,30 @@ public class GuiController implements Initializable {
             keyEvent.consume();
 
         });
-        gameOverPanel.setVisible(false);
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(false);
+        }
         if (pauseMenuOverlay != null) {
             pauseMenuOverlay.setVisible(false);
+        }
+        
+        // Wire up game over panel buttons
+        if (gameOverPanel != null) {
+            if (gameOverPanel.getPlayAgainButton() != null) {
+                gameOverPanel.getPlayAgainButton().setOnAction(this::newGame);
+            }
+            if (gameOverPanel.getMainMenuButton() != null) {
+                gameOverPanel.getMainMenuButton().setOnAction(this::returnToMainMenu);
+            }
         }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
+        if (!gridCreated) {
+            createGameBoardGrid(boardMatrix);
+            gridCreated = true;
+        }
+        
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
         for (int i = 2; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
@@ -148,6 +170,35 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutY(gameBoardY - 42 + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
 
         initNextPiecePanel(brick);
+    }
+
+    private void createGameBoardGrid(int[][] boardMatrix) {
+        Group gridGroup = new Group();
+        gridGroup.setMouseTransparent(true);
+        gridGroup.setManaged(false);
+        Color gridColor = Color.rgb(74, 158, 255, 0.3);
+        
+        int rows = boardMatrix.length - 2;
+        int cols = boardMatrix[0].length;
+        double cellSize = BRICK_SIZE + 1;
+        
+        for (int i = 0; i <= rows; i++) {
+            Line horizontalLine = new Line(0, i * cellSize, cols * cellSize, i * cellSize);
+            horizontalLine.setStroke(gridColor);
+            horizontalLine.setStrokeWidth(0.5);
+            horizontalLine.setMouseTransparent(true);
+            gridGroup.getChildren().add(horizontalLine);
+        }
+        
+        for (int j = 0; j <= cols; j++) {
+            Line verticalLine = new Line(j * cellSize, 0, j * cellSize, rows * cellSize);
+            verticalLine.setStroke(gridColor);
+            verticalLine.setStrokeWidth(0.5);
+            verticalLine.setMouseTransparent(true);
+            gridGroup.getChildren().add(verticalLine);
+        }
+        
+        gamePanel.getChildren().add(0, gridGroup);
     }
 
     private Paint getFillColor(int i) {
@@ -316,12 +367,25 @@ public class GuiController implements Initializable {
     }
 
     public void gameOver() {
-        gameOverPanel.setVisible(true);
+        // Set final score from current score label
+        try {
+            int finalScore = Integer.parseInt(scoreLabel.getText());
+            gameOverPanel.setFinalScore(finalScore);
+        } catch (NumberFormatException e) {
+            gameOverPanel.setFinalScore(0);
+        }
+        
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(true);
+        }
+        gameOverPanel.playAnimation();
         isGameOver.setValue(Boolean.TRUE);
     }
 
     public void newGame(ActionEvent actionEvent) {
-        gameOverPanel.setVisible(false);
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(false);
+        }
         eventListener.createNewGame();
         gamePanel.requestFocus();
         isPause.setValue(Boolean.FALSE);

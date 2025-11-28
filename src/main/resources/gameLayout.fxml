@@ -54,6 +54,7 @@
                 layoutX="250" layoutY="50">
         <center>
             <GridPane fx:id="gamePanel"
+                      styleClass="game-panel"
                       hgap="1"
                       vgap="1"
                       alignment="CENTER"/>
@@ -61,9 +62,11 @@
     </BorderPane>
 
     <Group fx:id="groupNotification" layoutX="263.5" layoutY="303">
-        <VBox alignment="CENTER">
-            <GameOverPanel fx:id="gameOverPanel"/>
-        </VBox>
+    </Group>
+
+    <Group fx:id="gameOverOverlay" visible="false" layoutX="0" layoutY="0">
+        <Rectangle width="700" height="600" styleClass="pause-dim-background"/>
+        <GameOverPanel fx:id="gameOverPanel" layoutX="200" layoutY="175"/>
     </Group>
 
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
