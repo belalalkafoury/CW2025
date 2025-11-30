@@ -30,4 +30,6 @@ public interface Board {
     int getGhostY(int currentX, int currentY);
     
     int[][] getCurrentShape();
+    
+    int hardDrop();
 }

@@ -22,5 +22,8 @@ public class InputHandler {
         else if (code == KeyCode.DOWN || code == KeyCode.S) {
             listener.onDownEvent(new MoveEvent(EventType.DOWN, EventSource.USER));
         }
+        else if (code == KeyCode.SPACE) {
+            listener.onHardDropEvent(new MoveEvent(EventType.HARD_DROP, EventSource.USER));
+        }
     }
 }

@@ -23,6 +23,10 @@ public class ScoreService {
         }
     }
 
+    public void applyHardDrop(int distance) {
+        score.add(distance * 2);
+    }
+
     public void applyLineClearBonus(ClearRow cleared) {
         if (cleared != null && cleared.getLinesRemoved() > 0) {
             score.add(cleared.getScoreBonus());

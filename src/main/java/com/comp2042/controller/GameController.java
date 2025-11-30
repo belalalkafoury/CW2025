@@ -78,7 +78,17 @@ public class GameController implements InputEventListener {
         return board.getViewData();
     }
 
-
+    @Override
+    public DownData onHardDropEvent(MoveEvent event) {
+        int distance = board.hardDrop();
+        if (distance > 0) {
+            scoreService.applyHardDrop(distance);
+            viewGuiController.refreshBrick(board.getViewData());
+            ClearRow cleared = handleBrickLanding();
+            return new DownData(cleared, board.getViewData());
+        }
+        return new DownData(null, board.getViewData());
+    }
 
     @Override
     public void createNewGame() {

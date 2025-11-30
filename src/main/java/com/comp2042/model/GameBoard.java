@@ -158,6 +158,20 @@ public class GameBoard implements Board {
                 (int) p.getX(),
                 (int) p.getY());
     }
+    
+    @Override
+    public int hardDrop() {
+        int currentX = (int) currentOffset.getX();
+        int currentY = (int) currentOffset.getY();
+        int ghostY = getGhostY(currentX, currentY);
+        int distance = ghostY - currentY;
+        
+        if (distance > 0) {
+            currentOffset = new Point(currentX, ghostY);
+            return distance;
+        }
+        return 0;
+    }
 
     @Override
     public int getGhostY(int currentX, int currentY) {
