@@ -26,4 +26,8 @@ public interface Board {
     Score getScore();
 
     void newGame();
+    
+    int getGhostY(int currentX, int currentY);
+    
+    int[][] getCurrentShape();
 }

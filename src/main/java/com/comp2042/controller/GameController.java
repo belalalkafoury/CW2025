@@ -29,6 +29,7 @@ public class GameController implements InputEventListener {
         this.inputHandler = new InputHandler(this);
         viewGuiController.setInputHandler(this.inputHandler);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
+        viewGuiController.setBoard(board);
         viewGuiController.bindScore(board.getScore().scoreProperty());
         this.animationController = new AnimationController(viewGuiController);
         viewGuiController.setAnimationController(this.animationController);
@@ -86,6 +87,9 @@ public class GameController implements InputEventListener {
         animationController.start();
     }
     private ClearRow handleBrickLanding() {
+        ViewData lastBrick = board.getViewData();
+        viewGuiController.refreshBrick(lastBrick);
+        viewGuiController.hideGhostPiece();
         board.mergeBrickToBackground();
         ClearRow cleared = board.clearRows();
         scoreService.applyLineClearBonus(cleared);
@@ -94,6 +98,7 @@ public class GameController implements InputEventListener {
             viewGuiController.gameOver();
         }
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        viewGuiController.animatePlacedBlocks(lastBrick);
         return cleared;
     }
 

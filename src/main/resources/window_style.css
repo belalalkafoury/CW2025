@@ -10,8 +10,8 @@
 
 .game-board {
     -fx-border-color: #4A9EFF;
-    -fx-border-width: 12px;
-    -fx-border-radius: 12px;
+    -fx-border-width: 8px;
+    -fx-border-radius: 0px;
 }
 
 .next-brick-label {

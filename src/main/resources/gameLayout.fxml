@@ -52,7 +52,8 @@
     </VBox>
 
     <BorderPane styleClass="game-board" fx:id="gameBoard" 
-                layoutX="250" layoutY="50">
+                layoutX="250" layoutY="50"
+                prefWidth="225" prefHeight="498">
         <center>
             <GridPane fx:id="gamePanel"
                       styleClass="game-panel"
@@ -71,6 +72,7 @@
     </Group>
 
     <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
+    <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true"/>
 
     <VBox alignment="TOP_CENTER" spacing="10" layoutX="520" layoutY="30" styleClass="right-panel">
         <Label text="NEXT" styleClass="panel-label"/>

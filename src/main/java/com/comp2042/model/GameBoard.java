@@ -109,7 +109,12 @@ public class GameBoard implements Board {
     public int[][] getBoardMatrix() {
         return currentGameMatrix;
     }
-
+    
+    @Override
+    public int[][] getCurrentShape() {
+        return brickRotator.getCurrentShape();
+    }
+    
     @Override
     public ViewData getViewData() {
         return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextBrick.getShapeMatrix().get(0)
@@ -154,5 +159,28 @@ public class GameBoard implements Board {
                 (int) p.getY());
     }
 
+    @Override
+    public int getGhostY(int currentX, int currentY) {
+        int[][] shape = brickRotator.getCurrentShape();
+        
+        if (shape == null || shape.length == 0) {
+            return currentY;
+        }
+        
+        int ghostY = currentY;
+        
+        while (true) {
+            int nextY = ghostY + 1;
+            Point testPos = new Point(currentX, nextY);
+            
+            if (!canPlaceAt(shape, testPos)) {
+                break;
+            }
+            
+            ghostY = nextY;
+        }
+        
+        return ghostY;
+    }
 
 }
