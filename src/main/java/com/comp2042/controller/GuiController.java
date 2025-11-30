@@ -2,6 +2,7 @@ package com.comp2042.controller;
 
 import com.comp2042.logic.board.DownData;
 import com.comp2042.view.GameOverPanel;
+import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.NotificationPanel;
 import com.comp2042.view.ViewData;
 import javafx.beans.property.BooleanProperty;
@@ -73,6 +74,12 @@ public class GuiController implements Initializable {
     @FXML
     private Group pauseMenuOverlay;
 
+    @FXML
+    private Group howToPlayOverlay;
+
+    @FXML
+    private HowToPlayPanel howToPlayPanel;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -96,6 +103,11 @@ public class GuiController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        try {
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+        } catch (Exception e) {
+            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
+        }
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
 
@@ -127,6 +139,9 @@ public class GuiController implements Initializable {
         if (pauseMenuOverlay != null) {
             pauseMenuOverlay.setVisible(false);
         }
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
         
         // Wire up game over panel buttons
         if (gameOverPanel != null) {
@@ -136,6 +151,11 @@ public class GuiController implements Initializable {
             if (gameOverPanel.getMainMenuButton() != null) {
                 gameOverPanel.getMainMenuButton().setOnAction(this::returnToMainMenu);
             }
+        }
+        
+        // Wire up how to play panel back button
+        if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
+            howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlay());
         }
     }
 
@@ -433,7 +453,18 @@ public class GuiController implements Initializable {
     }
 
     public void showHowToPlay(ActionEvent actionEvent) {
-        System.out.println("How to Play (placeholder)");
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(true);
+            if (howToPlayPanel != null) {
+                howToPlayPanel.playAnimation();
+            }
+        }
+    }
+    
+    public void hideHowToPlay() {
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
     }
 
     public void openSettings(ActionEvent actionEvent) {

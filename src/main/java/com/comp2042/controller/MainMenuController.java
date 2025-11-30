@@ -2,12 +2,14 @@ package com.comp2042.controller;
 
 import com.comp2042.model.Board;
 import com.comp2042.model.GameBoard;
+import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.TetrisLogo;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -30,6 +32,9 @@ public class MainMenuController implements Initializable {
     private Button quitButton;
 
     @FXML
+    private Button howToPlayButton;
+
+    @FXML
     private Pane animationContainer;
 
     @FXML
@@ -37,6 +42,12 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private TetrisLogo tetrisLogo;
+
+    @FXML
+    private Group howToPlayOverlay;
+
+    @FXML
+    private HowToPlayPanel howToPlayPanel;
 
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
@@ -46,6 +57,12 @@ public class MainMenuController implements Initializable {
         if (animationContainer != null) {
             animationController = new MainMenuAnimationController(animationContainer);
             animationController.start();
+        }
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
+        if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
+            howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlayFromMenu());
         }
     }
 
@@ -85,6 +102,22 @@ public class MainMenuController implements Initializable {
     @FXML
     private void quitGame(ActionEvent event) {
         Platform.exit();
+    }
+
+    @FXML
+    private void showHowToPlayFromMenu(ActionEvent event) {
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(true);
+            if (howToPlayPanel != null) {
+                howToPlayPanel.playAnimation();
+            }
+        }
+    }
+
+    private void hideHowToPlayFromMenu() {
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
     }
 }
 

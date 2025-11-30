@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class GameOverPanel extends StackPane {
@@ -25,6 +26,12 @@ public class GameOverPanel extends StackPane {
     public GameOverPanel() {
         setAlignment(Pos.CENTER);
         setBackground(Background.EMPTY);
+        
+        try {
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+        } catch (Exception e) {
+            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
+        }
         
         createContent();
     }
@@ -70,7 +77,7 @@ public class GameOverPanel extends StackPane {
             "-fx-background-color: rgba(0, 0, 0, 0.8);" +
             "-fx-background-radius: 6px;" +
             "-fx-text-fill: white;" +
-            "-fx-font-family: \"Let's go Digital\";" +
+            "-fx-font-family: \"Press Start 2P\";" +
             "-fx-font-size: 18px;" +
             "-fx-font-weight: bold;" +
             "-fx-pref-width: 220px;" +
@@ -85,7 +92,7 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-color: rgba(0, 255, 255, 0.2);" +
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
-                "-fx-font-family: \"Let's go Digital\";" +
+                "-fx-font-family: \"Press Start 2P\";" +
                 "-fx-font-size: 18px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-pref-width: 220px;" +
@@ -101,7 +108,7 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-color: rgba(0, 0, 0, 0.8);" +
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
-                "-fx-font-family: \"Let's go Digital\";" +
+                "-fx-font-family: \"Press Start 2P\";" +
                 "-fx-font-size: 18px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-pref-width: 220px;" +
@@ -118,7 +125,7 @@ public class GameOverPanel extends StackPane {
             "-fx-background-color: rgba(0, 0, 0, 0.8);" +
             "-fx-background-radius: 6px;" +
             "-fx-text-fill: white;" +
-            "-fx-font-family: \"Let's go Digital\";" +
+            "-fx-font-family: \"Press Start 2P\";" +
             "-fx-font-size: 18px;" +
             "-fx-font-weight: bold;" +
             "-fx-pref-width: 220px;" +
@@ -133,7 +140,7 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-color: rgba(255, 0, 0, 0.2);" +
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
-                "-fx-font-family: \"Let's go Digital\";" +
+                "-fx-font-family: \"Press Start 2P\";" +
                 "-fx-font-size: 18px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-pref-width: 220px;" +
@@ -149,7 +156,7 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-color: rgba(0, 0, 0, 0.8);" +
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
-                "-fx-font-family: \"Let's go Digital\";" +
+                "-fx-font-family: \"Press Start 2P\";" +
                 "-fx-font-size: 18px;" +
                 "-fx-font-weight: bold;" +
                 "-fx-pref-width: 220px;" +
