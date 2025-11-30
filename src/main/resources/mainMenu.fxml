@@ -1,7 +1,11 @@
+<?import com.comp2042.view.TetrisLogo?>
+<?import com.comp2042.view.HowToPlayPanel?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.shape.Rectangle?>
 <?import java.net.URL?>
 
 <Pane fx:controller="com.comp2042.controller.MainMenuController"
@@ -10,11 +14,17 @@
 
     <ImageView fitWidth="700" fitHeight="600" preserveRatio="false" pickOnBounds="true">
         <image>
-            <Image url="@menu.jpg"/>
+            <Image url="@background_image.png"/>
         </image>
     </ImageView>
 
-    <VBox alignment="CENTER" spacing="20" prefWidth="700" prefHeight="600" layoutX="0" layoutY="80">
+    <Pane fx:id="animationContainer" prefWidth="700" prefHeight="600" mouseTransparent="true" pickOnBounds="false"/>
+
+    <VBox fx:id="logoContainer" alignment="CENTER" spacing="20" prefWidth="700" prefHeight="150" layoutX="0" layoutY="20">
+        <TetrisLogo fx:id="tetrisLogo"/>
+    </VBox>
+
+    <VBox alignment="CENTER" spacing="20" prefWidth="700" prefHeight="600" layoutX="0" layoutY="50">
         <Button fx:id="playButton" onAction="#startGame" 
                 styleClass="image-button">
             <graphic>
@@ -48,6 +58,14 @@
             </graphic>
         </Button>
     </VBox>
+
+    <Button fx:id="howToPlayButton" text="!" onAction="#showHowToPlayFromMenu" 
+            styleClass="how-to-play-button"
+            layoutX="620" layoutY="530"/>
+
+    <Group fx:id="howToPlayOverlay" visible="false" layoutX="0" layoutY="0">
+        <HowToPlayPanel fx:id="howToPlayPanel" layoutX="0" layoutY="0"/>
+    </Group>
 
     <stylesheets>
         <URL value="@window_style.css"/>

@@ -2,30 +2,31 @@ package com.comp2042.controller;
 
 import com.comp2042.logic.board.DownData;
 import com.comp2042.view.GameOverPanel;
+import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.NotificationPanel;
 import com.comp2042.view.ViewData;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
-
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -48,6 +49,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private GameOverPanel gameOverPanel;
+    
+    @FXML
+    private Group gameOverOverlay;
 
     @FXML
     private Label scoreLabel;
@@ -67,6 +71,14 @@ public class GuiController implements Initializable {
     @FXML
     private Button pauseButton;
 
+    @FXML
+    private Group pauseMenuOverlay;
+
+    @FXML
+    private Group howToPlayOverlay;
+
+    @FXML
+    private HowToPlayPanel howToPlayPanel;
 
     private Rectangle[][] displayMatrix;
 
@@ -76,6 +88,7 @@ public class GuiController implements Initializable {
 
     private Rectangle[][] nextPieceRectangles;
 
+    private boolean gridCreated = false;
 
     private final BooleanProperty isPause = new SimpleBooleanProperty();
 
@@ -85,14 +98,28 @@ public class GuiController implements Initializable {
 
     private AnimationController animationController;
 
+    private Stage primaryStage;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        try {
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+        } catch (Exception e) {
+            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
+        }
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
 
         gamePanel.setOnKeyPressed(keyEvent -> {
             KeyCode code = keyEvent.getCode();
+            
+            if (code == KeyCode.ESCAPE) {
+                pauseGame(null);
+                keyEvent.consume();
+                return;
+            }
+            
             if (!isPause.get() && !isGameOver.get() && inputHandler != null) {
                 inputHandler.handleKey(code);
             }
@@ -106,10 +133,38 @@ public class GuiController implements Initializable {
             keyEvent.consume();
 
         });
-        gameOverPanel.setVisible(false);
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(false);
+        }
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(false);
+        }
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
+        
+        // Wire up game over panel buttons
+        if (gameOverPanel != null) {
+            if (gameOverPanel.getPlayAgainButton() != null) {
+                gameOverPanel.getPlayAgainButton().setOnAction(this::newGame);
+            }
+            if (gameOverPanel.getMainMenuButton() != null) {
+                gameOverPanel.getMainMenuButton().setOnAction(this::returnToMainMenu);
+            }
+        }
+        
+        // Wire up how to play panel back button
+        if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
+            howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlay());
+        }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
+        if (!gridCreated) {
+            createGameBoardGrid(boardMatrix);
+            gridCreated = true;
+        }
+        
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
         for (int i = 2; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
@@ -135,6 +190,35 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutY(gameBoardY - 42 + brick.getyPosition() * (brickPanel.getHgap() + BRICK_SIZE));
 
         initNextPiecePanel(brick);
+    }
+
+    private void createGameBoardGrid(int[][] boardMatrix) {
+        Group gridGroup = new Group();
+        gridGroup.setMouseTransparent(true);
+        gridGroup.setManaged(false);
+        Color gridColor = Color.rgb(74, 158, 255, 0.3);
+        
+        int rows = boardMatrix.length - 2;
+        int cols = boardMatrix[0].length;
+        double cellSize = BRICK_SIZE + 1;
+        
+        for (int i = 0; i <= rows; i++) {
+            Line horizontalLine = new Line(0, i * cellSize, cols * cellSize, i * cellSize);
+            horizontalLine.setStroke(gridColor);
+            horizontalLine.setStrokeWidth(0.5);
+            horizontalLine.setMouseTransparent(true);
+            gridGroup.getChildren().add(horizontalLine);
+        }
+        
+        for (int j = 0; j <= cols; j++) {
+            Line verticalLine = new Line(j * cellSize, 0, j * cellSize, rows * cellSize);
+            verticalLine.setStroke(gridColor);
+            verticalLine.setStrokeWidth(0.5);
+            verticalLine.setMouseTransparent(true);
+            gridGroup.getChildren().add(verticalLine);
+        }
+        
+        gamePanel.getChildren().add(0, gridGroup);
     }
 
     private Paint getFillColor(int i) {
@@ -303,12 +387,25 @@ public class GuiController implements Initializable {
     }
 
     public void gameOver() {
-        gameOverPanel.setVisible(true);
+        // Set final score from current score label
+        try {
+            int finalScore = Integer.parseInt(scoreLabel.getText());
+            gameOverPanel.setFinalScore(finalScore);
+        } catch (NumberFormatException e) {
+            gameOverPanel.setFinalScore(0);
+        }
+        
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(true);
+        }
+        gameOverPanel.playAnimation();
         isGameOver.setValue(Boolean.TRUE);
     }
 
     public void newGame(ActionEvent actionEvent) {
-        gameOverPanel.setVisible(false);
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(false);
+        }
         eventListener.createNewGame();
         gamePanel.requestFocus();
         isPause.setValue(Boolean.FALSE);
@@ -318,11 +415,79 @@ public class GuiController implements Initializable {
     public void pauseGame(ActionEvent actionEvent) {
         isPause.setValue(!isPause.getValue());
         if (isPause.getValue()) {
-            pauseButton.setText("▶");
+            if (pauseButton != null) {
+                pauseButton.setText("▶");
+            }
+            if (pauseMenuOverlay != null) {
+                pauseMenuOverlay.setVisible(true);
+            }
+            if (animationController != null) {
+                animationController.pause();
+            }
         } else {
-            pauseButton.setText("⏸");
+            if (pauseButton != null) {
+                pauseButton.setText("⏸");
+            }
+            if (pauseMenuOverlay != null) {
+                pauseMenuOverlay.setVisible(false);
+            }
+            if (animationController != null) {
+                animationController.resume();
+            }
         }
         gamePanel.requestFocus();
+    }
+
+    public void resumeGame(ActionEvent actionEvent) {
+        isPause.setValue(false);
+        if (pauseButton != null) {
+            pauseButton.setText("⏸");
+        }
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(false);
+        }
+        if (animationController != null) {
+            animationController.resume();
+        }
+        gamePanel.requestFocus();
+    }
+
+    public void showHowToPlay(ActionEvent actionEvent) {
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(true);
+            if (howToPlayPanel != null) {
+                howToPlayPanel.playAnimation();
+            }
+        }
+    }
+    
+    public void hideHowToPlay() {
+        if (howToPlayOverlay != null) {
+            howToPlayOverlay.setVisible(false);
+        }
+    }
+
+    public void openSettings(ActionEvent actionEvent) {
+        System.out.println("Settings (placeholder)");
+    }
+
+    public void returnToMainMenu(ActionEvent actionEvent) {
+        try {
+            URL location = getClass().getClassLoader().getResource("mainMenu.fxml");
+            FXMLLoader fxmlLoader = new FXMLLoader(location);
+            Parent root = fxmlLoader.load();
+            MainMenuController controller = fxmlLoader.getController();
+            controller.setPrimaryStage(primaryStage);
+
+            Scene menuScene = new Scene(root, 700, 600);
+            primaryStage.setScene(menuScene);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setPrimaryStage(Stage stage) {
+        this.primaryStage = stage;
     }
     public void moveDownFromTimer() {
         if (isPause.getValue() == Boolean.FALSE && isGameOver.getValue() == Boolean.FALSE) {

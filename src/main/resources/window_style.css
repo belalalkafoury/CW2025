@@ -15,7 +15,7 @@
 }
 
 .next-brick-label {
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-padding: 20px 0 0 0;
     -fx-font-size: 16px;
     -fx-text-fill: yellow;
@@ -31,7 +31,7 @@
     -fx-background-radius: 9, 8, 5, 4, 3;
     -fx-padding: 8;
     /*-fx-font-family: "Helvetica";*/
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 22px;
     -fx-font-weight: bold;
     -fx-text-fill: white;
@@ -59,20 +59,20 @@
 }
 
 .gameOverStyle {
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 48;
     -fx-background-color: red;
 }
 
 .scoreClass{
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 38;
     -fx-fill: yellow;
     -fx-text-fill: yellow;
 }
 
 .panel-label {
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 16px;
     -fx-text-fill: white;
     -fx-font-weight: bold;
@@ -101,14 +101,14 @@
 }
 
 .stats-label {
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 14px;
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }
 
 .stats-value {
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 24px;
     -fx-text-fill: #6FCCFF;
 }
@@ -129,12 +129,32 @@
     -fx-background-color: rgba(0, 0, 0, 0.7);
     -fx-background-radius: 17px;
     -fx-text-fill: white;
-    -fx-font-family: "Let's go Digital";
+    -fx-font-family: "Press Start 2P";
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-pref-width: 50px;
     -fx-pref-height: 50px;
     -fx-cursor: hand;
+}
+
+.how-to-play-button {
+    -fx-border-width: 2px;
+    -fx-border-color: #5FAFFF;
+    -fx-border-radius: 17px;
+    -fx-background-color: rgba(0, 0, 0, 0.7);
+    -fx-background-radius: 17px;
+    -fx-text-fill: #5FAFFF;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.how-to-play-button:hover {
+    -fx-background-color: rgba(95, 175, 255, 0.2);
+    -fx-border-color: #6FCCFF;
 }
 
 .pause-button:hover {
@@ -163,4 +183,111 @@
 
 .image-button:pressed {
     -fx-opacity: 0.6;
+}
+
+.pause-dim-background {
+    -fx-fill: rgba(0, 0, 0, 0.6);
+}
+
+.pause-menu-panel {
+    -fx-border-width: 3px;
+    -fx-border-color: #BF5FFF;
+    -fx-border-radius: 10px;
+    -fx-background-color: rgba(0, 0, 0, 0.85);
+    -fx-background-radius: 10px;
+    -fx-padding: 30px 40px;
+    -fx-pref-width: 300px;
+}
+
+.pause-title {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 28px;
+    -fx-text-fill: #00FFFF;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #BF5FFF, 6, 0.8, 0, 0);
+}
+
+.pause-buttons-container {
+    -fx-spacing: 12px;
+    -fx-padding: 15px 0 0 0;
+}
+
+.pause-button-resume {
+    -fx-border-width: 2px;
+    -fx-border-color: #00FFFF;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.pause-button-resume:hover {
+    -fx-background-color: rgba(0, 255, 255, 0.2);
+    -fx-border-color: #00FFFF;
+}
+
+.pause-button-howto {
+    -fx-border-width: 2px;
+    -fx-border-color: #FFFF00;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.pause-button-howto:hover {
+    -fx-background-color: rgba(255, 255, 0, 0.2);
+    -fx-border-color: #FFFF00;
+}
+
+.pause-button-settings {
+    -fx-border-width: 2px;
+    -fx-border-color: #FFA500;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.pause-button-settings:hover {
+    -fx-background-color: rgba(255, 165, 0, 0.2);
+    -fx-border-color: #FFA500;
+}
+
+.pause-button-menu {
+    -fx-border-width: 2px;
+    -fx-border-color: #5FAFFF;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.pause-button-menu:hover {
+    -fx-background-color: rgba(95, 175, 255, 0.2);
+    -fx-border-color: #5FAFFF;
 }

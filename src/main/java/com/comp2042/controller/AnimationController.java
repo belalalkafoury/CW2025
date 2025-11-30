@@ -2,8 +2,6 @@ package com.comp2042.controller;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.util.Duration;import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class AnimationController {
@@ -24,11 +22,11 @@ public class AnimationController {
 
     public void updateSpeed(int level) {
         double dropSpeed = Math.max(MIN_DROP_SPEED_MILLIS, BASE_DROP_SPEED_MILLIS - (level - 1) * SPEED_INCREASE_PER_LEVEL);
-        
+
         if (timeline != null) {
             timeline.stop();
         }
-        
+
         timeline = new Timeline(new KeyFrame(
                 Duration.millis(dropSpeed),
                 e -> guiController.moveDownFromTimer()
