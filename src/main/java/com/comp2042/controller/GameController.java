@@ -18,6 +18,8 @@ public class GameController implements InputEventListener {
 
     private final ScoreService scoreService;
 
+    private boolean isClearing = false;
+
 
 
     public GameController(GuiController c, Board board) {
@@ -40,6 +42,9 @@ public class GameController implements InputEventListener {
 
     @Override
     public DownData onDownEvent(MoveEvent event) {
+        if (isClearing) {
+            return new DownData(null, board.getViewData());
+        }
         boolean canMove = board.moveBrickDown();
         ClearRow clearRow = null;
 
@@ -57,6 +62,9 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onLeftEvent(MoveEvent event) {
+        if (isClearing) {
+            return board.getViewData();
+        }
         board.moveBrickLeft();
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
@@ -65,6 +73,9 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onRightEvent(MoveEvent event) {
+        if (isClearing) {
+            return board.getViewData();
+        }
         board.moveBrickRight();
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
@@ -73,6 +84,9 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onRotateEvent(MoveEvent event) {
+        if (isClearing) {
+            return board.getViewData();
+        }
         board.rotateLeftBrick();
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
@@ -80,10 +94,12 @@ public class GameController implements InputEventListener {
 
     @Override
     public DownData onHardDropEvent(MoveEvent event) {
+        if (isClearing) {
+            return new DownData(null, board.getViewData());
+        }
         int distance = board.hardDrop();
         if (distance > 0) {
             scoreService.applyHardDrop(distance);
-            viewGuiController.refreshBrick(board.getViewData());
             ClearRow cleared = handleBrickLanding();
             return new DownData(cleared, board.getViewData());
         }
@@ -93,23 +109,51 @@ public class GameController implements InputEventListener {
     @Override
     public void createNewGame() {
         board.newGame();
+        isClearing = false;
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
         animationController.start();
     }
     private ClearRow handleBrickLanding() {
         ViewData lastBrick = board.getViewData();
-        viewGuiController.refreshBrick(lastBrick);
         viewGuiController.hideGhostPiece();
+        
         board.mergeBrickToBackground();
-        ClearRow cleared = board.clearRows();
-        scoreService.applyLineClearBonus(cleared);
-        if (!board.createNewBrick()) {
-            animationController.stop();
-            viewGuiController.gameOver();
-        }
+        
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        viewGuiController.animatePlacedBlocks(lastBrick);
-        return cleared;
+        
+        viewGuiController.hideFallingBrick();
+        
+        ClearRow result = board.checkClears();
+        
+        if (result.getLinesRemoved() > 0) {
+            isClearing = true;
+            viewGuiController.animateClear(result.getClearedIndices(), () -> {
+                board.commitClear(result);
+                scoreService.applyLineClearBonus(result);
+                
+                viewGuiController.refreshGameBackground(board.getBoardMatrix());
+                
+                if (!board.createNewBrick()) {
+                    animationController.stop();
+                    viewGuiController.gameOver();
+                    isClearing = false;
+                } else {
+                    viewGuiController.showFallingBrick();
+                    isClearing = false;
+                }
+            });
+        } else {
+            scoreService.applyLineClearBonus(result);
+            if (!board.createNewBrick()) {
+                animationController.stop();
+                viewGuiController.gameOver();
+            } else {
+                viewGuiController.showFallingBrick();
+            }
+            viewGuiController.animatePlacedBlocks(lastBrick);
+        }
+        
+        return result;
     }
 
     private void updateScoreOnUserSoftDrop(MoveEvent event) {

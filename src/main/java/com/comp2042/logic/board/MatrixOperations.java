@@ -53,12 +53,12 @@ public class MatrixOperations {
 
     public static int[][] merge(int[][] filledFields, int[][] brick, int x, int y) {
         int[][] copy = copy(filledFields);
-        for (int i = 0; i < brick.length; i++) {
-            for (int j = 0; j < brick[i].length; j++) {
-                int targetX = x + i;
-                int targetY = y + j;
-                if (brick[j][i] != 0) {
-                    copy[targetY][targetX] = brick[j][i];
+        for (int row = 0; row < brick.length; row++) {
+            for (int col = 0; col < brick[row].length; col++) {
+                if (brick[row][col] != 0) {
+                    int targetRow = y + row;
+                    int targetCol = x + col;
+                    copy[targetRow][targetCol] = brick[row][col];
                 }
             }
         }
@@ -71,30 +71,52 @@ public class MatrixOperations {
         List<Integer> clearedRows = new ArrayList<>();
 
         for (int i = 0; i < matrix.length; i++) {
-            int[] tmpRow = new int[matrix[i].length];
             boolean rowToClear = true;
             for (int j = 0; j < matrix[0].length; j++) {
                 if (matrix[i][j] == 0) {
                     rowToClear = false;
+                    break;
                 }
-                tmpRow[j] = matrix[i][j];
             }
             if (rowToClear) {
                 clearedRows.add(i);
             } else {
+                int[] tmpRow = new int[matrix[i].length];
+                System.arraycopy(matrix[i], 0, tmpRow, 0, matrix[i].length);
                 newRows.add(tmpRow);
             }
         }
-        for (int i = matrix.length - 1; i >= 0; i--) {
-            int[] row = newRows.pollLast();
-            if (row != null) {
-                tmp[i] = row;
-            } else {
-                break;
+        
+        for (int i = 0; i < tmp.length; i++) {
+            for (int j = 0; j < tmp[i].length; j++) {
+                tmp[i][j] = 0;
             }
         }
+        
+        int rowIndex = matrix.length - 1;
+        while (!newRows.isEmpty() && rowIndex >= 0) {
+            int[] row = newRows.pollLast();
+            if (row != null) {
+                if (row.length == tmp[rowIndex].length) {
+                    System.arraycopy(row, 0, tmp[rowIndex], 0, row.length);
+                } else {
+                    for (int j = 0; j < Math.min(row.length, tmp[rowIndex].length); j++) {
+                        tmp[rowIndex][j] = row[j];
+                    }
+                }
+                rowIndex--;
+            }
+        }
+        
+        while (rowIndex >= 0) {
+            for (int j = 0; j < tmp[rowIndex].length; j++) {
+                tmp[rowIndex][j] = 0;
+            }
+            rowIndex--;
+        }
+        
         int scoreBonus = 50 * clearedRows.size() * clearedRows.size();
-        return new ClearRow(clearedRows.size(), tmp, scoreBonus);
+        return new ClearRow(clearedRows.size(), tmp, scoreBonus, clearedRows);
     }
 
     public static List<int[][]> deepCopyList(List<int[][]> list){

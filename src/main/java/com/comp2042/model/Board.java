@@ -21,7 +21,9 @@ public interface Board {
 
     void mergeBrickToBackground();
 
-    ClearRow clearRows();
+    ClearRow checkClears();
+
+    void commitClear(ClearRow clearRow);
 
     Score getScore();
 
@@ -32,4 +34,6 @@ public interface Board {
     int[][] getCurrentShape();
     
     int hardDrop();
+    
+    java.util.List<Integer> getRowsToClear();
 }

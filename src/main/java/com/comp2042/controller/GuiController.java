@@ -30,7 +30,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.animation.FadeTransition;
 import javafx.animation.Timeline;
+import javafx.animation.ParallelTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.FillTransition;
 import javafx.util.Duration;
+import java.util.List;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -50,15 +54,15 @@ public class GuiController implements Initializable {
 
     @FXML
     private GridPane brickPanel;
-    
+
     @FXML
     private GridPane ghostPanel;
-    
+
 
 
     @FXML
     private GameOverPanel gameOverPanel;
-    
+
     @FXML
     private Group gameOverOverlay;
 
@@ -96,9 +100,11 @@ public class GuiController implements Initializable {
     private Rectangle[][] rectangles;
 
     private Rectangle[][] nextPieceRectangles;
-    
+
     private Rectangle[][] ghostRectangles;
-    
+
+    private java.util.List<Rectangle> activeGhostRects = new java.util.ArrayList<>();
+
     private Board board;
 
     private boolean gridCreated = false;
@@ -126,13 +132,13 @@ public class GuiController implements Initializable {
 
         gamePanel.setOnKeyPressed(keyEvent -> {
             KeyCode code = keyEvent.getCode();
-            
+
             if (code == KeyCode.ESCAPE) {
                 pauseGame(null);
                 keyEvent.consume();
                 return;
             }
-            
+
             if (!isPause.get() && !isGameOver.get() && inputHandler != null) {
                 inputHandler.handleKey(code);
             }
@@ -155,7 +161,7 @@ public class GuiController implements Initializable {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
         }
-        
+
         // Wire up game over panel buttons
         if (gameOverPanel != null) {
             if (gameOverPanel.getPlayAgainButton() != null) {
@@ -165,7 +171,7 @@ public class GuiController implements Initializable {
                 gameOverPanel.getMainMenuButton().setOnAction(this::returnToMainMenu);
             }
         }
-        
+
         // Wire up how to play panel back button
         if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
             howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlay());
@@ -177,7 +183,7 @@ public class GuiController implements Initializable {
             createGameBoardGrid(boardMatrix);
             gridCreated = true;
         }
-        
+
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
         for (int i = 2; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
@@ -199,7 +205,7 @@ public class GuiController implements Initializable {
                 brickPanel.add(rectangle, j, i);
             }
         }
-        
+
         double gameBoardX = gameBoard.getLayoutX() + 8;
         double gameBoardY = gameBoard.getLayoutY() + 8;
         double cellSize = BRICK_SIZE + 1;
@@ -209,7 +215,7 @@ public class GuiController implements Initializable {
         initNextPiecePanel(brick);
         initGhostPiece(brick);
     }
-    
+
     private void initGhostPiece(ViewData brick) {
         int[][] shape = brick.getBrickData();
         ghostRectangles = new Rectangle[shape.length][shape[0].length];
@@ -233,11 +239,11 @@ public class GuiController implements Initializable {
         gridGroup.setMouseTransparent(true);
         gridGroup.setManaged(false);
         Color gridColor = Color.rgb(74, 158, 255, 0.3);
-        
+
         int rows = boardMatrix.length - 2;
         int cols = boardMatrix[0].length;
         double cellSize = BRICK_SIZE + 1;
-        
+
         for (int i = 0; i <= rows; i++) {
             Line horizontalLine = new Line(0, i * cellSize, cols * cellSize, i * cellSize);
             horizontalLine.setStroke(gridColor);
@@ -245,7 +251,7 @@ public class GuiController implements Initializable {
             horizontalLine.setMouseTransparent(true);
             gridGroup.getChildren().add(horizontalLine);
         }
-        
+
         for (int j = 0; j <= cols; j++) {
             Line verticalLine = new Line(j * cellSize, 0, j * cellSize, rows * cellSize);
             verticalLine.setStroke(gridColor);
@@ -253,7 +259,7 @@ public class GuiController implements Initializable {
             verticalLine.setMouseTransparent(true);
             gridGroup.getChildren().add(verticalLine);
         }
-        
+
         gamePanel.getChildren().add(0, gridGroup);
     }
 
@@ -297,45 +303,68 @@ public class GuiController implements Initializable {
             double gameBoardX = gameBoard.getLayoutX() + 8;
             double gameBoardY = gameBoard.getLayoutY() + 8;
             double cellSize = BRICK_SIZE + 1;
+            
+            updateGhostPiece(brick);
+            
+            if (brickPanel.getParent() != null) {
+                brickPanel.toFront();
+            }
+            
+            int currentY = brick.getyPosition();
+            int ghostY = board.getGhostY(brick.getxPosition(), currentY);
+            boolean isAtLandingPosition = (ghostY == currentY);
+            
             brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * cellSize);
-            brickPanel.setLayoutY(gameBoardY - 42 + (brick.getyPosition() - 2) * cellSize);
+            if (isAtLandingPosition) {
+                brickPanel.setLayoutY(gameBoardY - 42 + currentY * cellSize);
+            } else {
+                brickPanel.setLayoutY(gameBoardY - 42 + (currentY - 2) * cellSize);
+            }
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
+                    rectangles[i][j].setOpacity(1.0);
                 }
             }
             updateNextPiecePanel(brick);
-            updateGhostPiece(brick);
         }
     }
-    
+
     private void updateGhostPiece(ViewData brick) {
         if (board == null || ghostPanel == null || ghostRectangles == null) {
             return;
         }
-        
+
+        for (Rectangle rect : activeGhostRects) {
+            if (rect != null) {
+                rect.setFill(Color.TRANSPARENT);
+                rect.setVisible(false);
+            }
+        }
+        activeGhostRects.clear();
+
         int currentX = brick.getxPosition();
         int currentY = brick.getyPosition();
         int ghostY = board.getGhostY(currentX, currentY);
-        
+
         int[][] shape = board.getCurrentShape();
-        
+
         if (shape == null || shape.length == 0 || shape[0].length == 0) {
             ghostPanel.setVisible(false);
             return;
         }
-        
+
         int distance = ghostY - currentY;
-        
+
         if (distance < 0) {
             ghostPanel.setVisible(false);
             return;
         }
-        
+
         ghostPanel.setVisible(true);
-        
-        if (ghostRectangles.length != shape.length || 
-            (ghostRectangles.length > 0 && ghostRectangles[0].length != shape[0].length)) {
+
+        if (ghostRectangles.length != shape.length ||
+                (ghostRectangles.length > 0 && ghostRectangles[0].length != shape[0].length)) {
             ghostPanel.getChildren().clear();
             ghostRectangles = new Rectangle[shape.length][shape[0].length];
             ghostPanel.setHgap(1);
@@ -351,14 +380,14 @@ public class GuiController implements Initializable {
                 }
             }
         }
-        
+
         double gameBoardX = gameBoard.getLayoutX() + 8;
         double gameBoardY = gameBoard.getLayoutY() + 8;
         double cellSize = BRICK_SIZE + 1;
-        
+
         ghostPanel.setLayoutX(gameBoardX + currentX * cellSize);
         ghostPanel.setLayoutY(gameBoardY - 42 + ghostY * cellSize);
-        
+
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
                 if (i < ghostRectangles.length && j < ghostRectangles[i].length) {
@@ -371,6 +400,7 @@ public class GuiController implements Initializable {
                             rect.setStrokeWidth(2.0);
                             rect.setOpacity(1.0);
                             rect.setVisible(true);
+                            activeGhostRects.add(rect);
                         }
                     } else {
                         rect.setVisible(false);
@@ -387,30 +417,97 @@ public class GuiController implements Initializable {
             }
         }
     }
-    
+
     public void hideGhostPiece() {
         if (ghostPanel != null) {
             ghostPanel.setVisible(false);
         }
     }
-    
+
+    public void hideFallingBrick() {
+        if (brickPanel != null) {
+            brickPanel.setVisible(false);
+        }
+    }
+
+    public void showFallingBrick() {
+        if (brickPanel != null) {
+            brickPanel.setVisible(true);
+        }
+    }
+
+    public void animateClear(List<Integer> rows, Runnable onFinished) {
+        if (rows == null || rows.isEmpty() || displayMatrix == null) {
+            if (onFinished != null) {
+                onFinished.run();
+            }
+            return;
+        }
+
+        ParallelTransition parallelTransition = new ParallelTransition();
+
+        for (Integer rowIndex : rows) {
+            if (rowIndex >= 2 && rowIndex < displayMatrix.length) {
+                for (int col = 0; col < displayMatrix[rowIndex].length; col++) {
+                    Rectangle rect = displayMatrix[rowIndex][col];
+                    if (rect != null && rect.isVisible() && rect.getOpacity() > 0.1) {
+                        Color originalColor = (Color) rect.getFill();
+                        
+                        FillTransition flash = new FillTransition(Duration.millis(100), rect);
+                        flash.setFromValue(originalColor);
+                        flash.setToValue(Color.WHITE);
+                        
+                        FadeTransition fade = new FadeTransition(Duration.millis(200), rect);
+                        fade.setFromValue(1.0);
+                        fade.setToValue(0.0);
+                        
+                        SequentialTransition sequence = new SequentialTransition(flash, fade);
+                        parallelTransition.getChildren().add(sequence);
+                    }
+                }
+            }
+        }
+
+        if (parallelTransition.getChildren().isEmpty()) {
+            if (onFinished != null) {
+                onFinished.run();
+            }
+            return;
+        }
+
+        parallelTransition.setOnFinished(e -> {
+            for (int i = 2; i < displayMatrix.length; i++) {
+                for (int j = 0; j < displayMatrix[i].length; j++) {
+                    if (displayMatrix[i][j] != null) {
+                        displayMatrix[i][j].setOpacity(1.0);
+                    }
+                }
+            }
+            if (onFinished != null) {
+                onFinished.run();
+            }
+        });
+
+        parallelTransition.play();
+    }
+
     public void animatePlacedBlocks(ViewData lastBrick) {
         if (lastBrick == null || displayMatrix == null) {
             return;
         }
-        
+
         int[][] shape = lastBrick.getBrickData();
         int xPos = lastBrick.getxPosition();
         int yPos = lastBrick.getyPosition();
-        
+
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
                 if (shape[j][i] != 0) {
                     int boardRow = yPos + j;
                     int boardCol = xPos + i;
-                    
-                    if (boardRow >= 2 && boardRow < displayMatrix.length && 
-                        boardCol >= 0 && boardCol < displayMatrix[0].length) {
+
+                    if (boardRow >= 2 && boardRow < displayMatrix.length &&
+                            boardCol >= 0 && boardCol < displayMatrix[0].length) {
                         Rectangle rect = displayMatrix[boardRow][boardCol];
                         if (rect != null) {
                             FadeTransition blink = new FadeTransition(Duration.millis(150), rect);
@@ -461,19 +558,19 @@ public class GuiController implements Initializable {
 
     public void bindLines(IntegerProperty integerProperty) {
         linesLabel.textProperty().bind(integerProperty.asString("%d"));
-        
+
         int initialLines = integerProperty.get();
         int initialLevel = (initialLines / 10) + 1;
         levelLabel.setText(String.valueOf(initialLevel));
         if (animationController != null) {
             animationController.updateSpeed(initialLevel);
         }
-        
+
         integerProperty.addListener((obs, oldVal, newVal) -> {
             int lines = newVal.intValue();
             int level = (lines / 10) + 1;
             levelLabel.setText(String.valueOf(level));
-            
+
             if (animationController != null) {
                 animationController.updateSpeed(level);
             }
@@ -488,17 +585,17 @@ public class GuiController implements Initializable {
         if (nextPiece1 == null || brick == null) return;
 
         nextPiece1.getChildren().clear();
-        
+
         int[][] nextBrickData = brick.getNextBrickData();
         if (nextBrickData == null || nextBrickData.length == 0) return;
-        
+
         nextPieceRectangles = new Rectangle[nextBrickData.length][];
         for (int i = 0; i < nextBrickData.length; i++) {
             if (nextBrickData[i] != null) {
                 nextPieceRectangles[i] = new Rectangle[nextBrickData[i].length];
             }
         }
-        
+
         for (int i = 0; i < nextBrickData.length; i++) {
             if (nextBrickData[i] != null) {
                 for (int j = 0; j < nextBrickData[i].length; j++) {
@@ -514,14 +611,14 @@ public class GuiController implements Initializable {
 
     private void updateNextPiecePanel(ViewData brick) {
         if (nextPiece1 == null || brick == null) return;
-        
+
         int[][] nextBrickData = brick.getNextBrickData();
         if (nextBrickData == null || nextBrickData.length == 0) return;
 
-        if (nextPieceRectangles == null || 
-            nextPieceRectangles.length != nextBrickData.length ||
-            (nextPieceRectangles.length > 0 && nextPieceRectangles[0] != null && 
-             nextBrickData[0] != null && nextPieceRectangles[0].length != nextBrickData[0].length)) {
+        if (nextPieceRectangles == null ||
+                nextPieceRectangles.length != nextBrickData.length ||
+                (nextPieceRectangles.length > 0 && nextPieceRectangles[0] != null &&
+                        nextBrickData[0] != null && nextPieceRectangles[0].length != nextBrickData[0].length)) {
             initNextPiecePanel(brick);
             return;
         }
@@ -542,7 +639,7 @@ public class GuiController implements Initializable {
         if (brickPanel != null) {
             brickPanel.setVisible(false);
         }
-        
+
         // Set final score from current score label
         try {
             int finalScore = Integer.parseInt(scoreLabel.getText());
@@ -550,7 +647,7 @@ public class GuiController implements Initializable {
         } catch (NumberFormatException e) {
             gameOverPanel.setFinalScore(0);
         }
-        
+
         if (gameOverOverlay != null) {
             gameOverOverlay.setVisible(true);
         }
@@ -619,7 +716,7 @@ public class GuiController implements Initializable {
             }
         }
     }
-    
+
     public void hideHowToPlay() {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);

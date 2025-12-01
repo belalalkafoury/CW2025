@@ -83,7 +83,8 @@ public class GameBoardTest {
             matrix[bottomRow][col] = 1;
         }
 
-        var result = board.clearRows();
+        var result = board.checkClears();
+        board.commitClear(result);
         assertEquals(1, result.getLinesRemoved(),
                 "Exactly one full row should be cleared");
     }

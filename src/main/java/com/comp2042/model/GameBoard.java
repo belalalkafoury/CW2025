@@ -127,11 +127,22 @@ public class GameBoard implements Board {
     }
 
     @Override
-    public ClearRow clearRows() {
-        ClearRow clearRow = MatrixOperations.checkRemoving(currentGameMatrix);
-        currentGameMatrix = clearRow.getNewMatrix();
-        return clearRow;
+    public ClearRow checkClears() {
+        return MatrixOperations.checkRemoving(currentGameMatrix);
+    }
 
+    @Override
+    public void commitClear(ClearRow clearRow) {
+        int[][] newMatrix = clearRow.getNewMatrix();
+        for (int i = 0; i < currentGameMatrix.length; i++) {
+            for (int j = 0; j < currentGameMatrix[i].length; j++) {
+                if (i < newMatrix.length && j < newMatrix[i].length) {
+                    currentGameMatrix[i][j] = newMatrix[i][j];
+                } else {
+                    currentGameMatrix[i][j] = 0;
+                }
+            }
+        }
     }
 
     public Score getScore() {
@@ -171,6 +182,24 @@ public class GameBoard implements Board {
             return distance;
         }
         return 0;
+    }
+    
+    @Override
+    public java.util.List<Integer> getRowsToClear() {
+        java.util.List<Integer> clearedRows = new java.util.ArrayList<>();
+        for (int i = 0; i < currentGameMatrix.length; i++) {
+            boolean rowToClear = true;
+            for (int j = 0; j < currentGameMatrix[0].length; j++) {
+                if (currentGameMatrix[i][j] == 0) {
+                    rowToClear = false;
+                    break;
+                }
+            }
+            if (rowToClear) {
+                clearedRows.add(i);
+            }
+        }
+        return clearedRows;
     }
 
     @Override
