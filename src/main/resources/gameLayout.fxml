@@ -110,6 +110,13 @@
         <HowToPlayPanel fx:id="howToPlayPanel" layoutX="0" layoutY="0"/>
     </Group>
 
+    <Group fx:id="countdownOverlay" visible="false" layoutX="0" layoutY="0">
+        <Rectangle width="700" height="600" styleClass="pause-dim-background"/>
+        <StackPane alignment="CENTER" prefWidth="700" prefHeight="600">
+            <Label fx:id="countdownLabel" text="3" styleClass="countdown-text"/>
+        </StackPane>
+    </Group>
+
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>

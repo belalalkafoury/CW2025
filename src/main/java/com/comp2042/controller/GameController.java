@@ -18,13 +18,20 @@ public class GameController implements InputEventListener {
 
     private final ScoreService scoreService;
 
+    private final SoundController soundController;
+
     private boolean isClearing = false;
 
+    private boolean isCountdown = true;
 
-
-    public GameController(GuiController c, Board board) {
+    public GameController(GuiController c, Board board, SoundController soundController) {
         this.viewGuiController = c;
-        this.board = board; // Now it's initialized
+        this.board = board;
+        this.soundController = soundController;
+
+        if (soundController != null) {
+            soundController.stopTitleMusic();
+        }
 
         board.createNewBrick();
         viewGuiController.setEventListener(this);
@@ -35,14 +42,21 @@ public class GameController implements InputEventListener {
         viewGuiController.bindScore(board.getScore().scoreProperty());
         this.animationController = new AnimationController(viewGuiController);
         viewGuiController.setAnimationController(this.animationController);
-        this.animationController.start();
         this.scoreService = new ScoreService(board.getScore());
-        viewGuiController.bindLines(board.getScore().linesProperty());
+        viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
+
+        if (soundController != null) {
+            soundController.playCountdown();
+        }
+        viewGuiController.showCountdown(soundController, () -> {
+            isCountdown = false;
+            animationController.start();
+        });
     }
 
     @Override
     public DownData onDownEvent(MoveEvent event) {
-        if (isClearing) {
+        if (isClearing || isCountdown) {
             return new DownData(null, board.getViewData());
         }
         boolean canMove = board.moveBrickDown();
@@ -52,6 +66,9 @@ public class GameController implements InputEventListener {
             clearRow = handleBrickLanding();
         } else {
             updateScoreOnUserSoftDrop(event);
+            if (soundController != null && event.getEventSource() == com.comp2042.controller.EventSource.USER) {
+                soundController.playMove();
+            }
             viewGuiController.refreshBrick(board.getViewData());
         }
 
@@ -62,10 +79,13 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onLeftEvent(MoveEvent event) {
-        if (isClearing) {
+        if (isClearing || isCountdown) {
             return board.getViewData();
         }
         board.moveBrickLeft();
+        if (soundController != null && event.getEventSource() == com.comp2042.controller.EventSource.USER) {
+            soundController.playMove();
+        }
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
@@ -73,10 +93,13 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onRightEvent(MoveEvent event) {
-        if (isClearing) {
+        if (isClearing || isCountdown) {
             return board.getViewData();
         }
         board.moveBrickRight();
+        if (soundController != null && event.getEventSource() == com.comp2042.controller.EventSource.USER) {
+            soundController.playMove();
+        }
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
@@ -84,21 +107,27 @@ public class GameController implements InputEventListener {
 
     @Override
     public ViewData onRotateEvent(MoveEvent event) {
-        if (isClearing) {
+        if (isClearing || isCountdown) {
             return board.getViewData();
         }
         board.rotateLeftBrick();
+        if (soundController != null && event.getEventSource() == com.comp2042.controller.EventSource.USER) {
+            soundController.playRotate();
+        }
         viewGuiController.refreshBrick(board.getViewData());
         return board.getViewData();
     }
 
     @Override
     public DownData onHardDropEvent(MoveEvent event) {
-        if (isClearing) {
+        if (isClearing || isCountdown) {
             return new DownData(null, board.getViewData());
         }
         int distance = board.hardDrop();
         if (distance > 0) {
+        if (soundController != null) {
+            soundController.playHardDrop();
+        }
             scoreService.applyHardDrop(distance);
             ClearRow cleared = handleBrickLanding();
             return new DownData(cleared, board.getViewData());
@@ -110,8 +139,15 @@ public class GameController implements InputEventListener {
     public void createNewGame() {
         board.newGame();
         isClearing = false;
+        isCountdown = true;
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        animationController.start();
+        if (soundController != null) {
+            soundController.playCountdown();
+        }
+        viewGuiController.showCountdown(soundController, () -> {
+            isCountdown = false;
+            animationController.start();
+        });
     }
     private ClearRow handleBrickLanding() {
         ViewData lastBrick = board.getViewData();
@@ -127,6 +163,9 @@ public class GameController implements InputEventListener {
         
         if (result.getLinesRemoved() > 0) {
             isClearing = true;
+        if (soundController != null) {
+            soundController.playLineClear();
+        }
             viewGuiController.animateClear(result.getClearedIndices(), () -> {
                 board.commitClear(result);
                 scoreService.applyLineClearBonus(result);
@@ -135,7 +174,7 @@ public class GameController implements InputEventListener {
                 
                 if (!board.createNewBrick()) {
                     animationController.stop();
-                    viewGuiController.gameOver();
+                    viewGuiController.gameOver(soundController);
                     isClearing = false;
                 } else {
                     viewGuiController.showFallingBrick();
@@ -146,7 +185,7 @@ public class GameController implements InputEventListener {
             scoreService.applyLineClearBonus(result);
             if (!board.createNewBrick()) {
                 animationController.stop();
-                viewGuiController.gameOver();
+                viewGuiController.gameOver(soundController);
             } else {
                 viewGuiController.showFallingBrick();
             }

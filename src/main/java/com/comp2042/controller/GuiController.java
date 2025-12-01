@@ -1,6 +1,7 @@
 package com.comp2042.controller;
 
 import com.comp2042.logic.board.DownData;
+import com.comp2042.logic.score.HighScoreService;
 import com.comp2042.model.Board;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
@@ -33,6 +34,7 @@ import javafx.animation.Timeline;
 import javafx.animation.ParallelTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.FillTransition;
+import javafx.animation.KeyFrame;
 import javafx.util.Duration;
 import java.util.List;
 
@@ -93,6 +95,12 @@ public class GuiController implements Initializable {
     @FXML
     private HowToPlayPanel howToPlayPanel;
 
+    @FXML
+    private Group countdownOverlay;
+
+    @FXML
+    private Label countdownLabel;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -118,6 +126,8 @@ public class GuiController implements Initializable {
     private AnimationController animationController;
 
     private Stage primaryStage;
+
+    private HighScoreService highScoreService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -161,8 +171,10 @@ public class GuiController implements Initializable {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
         }
+        if (countdownOverlay != null) {
+            countdownOverlay.setVisible(false);
+        }
 
-        // Wire up game over panel buttons
         if (gameOverPanel != null) {
             if (gameOverPanel.getPlayAgainButton() != null) {
                 gameOverPanel.getPlayAgainButton().setOnAction(this::newGame);
@@ -172,10 +184,11 @@ public class GuiController implements Initializable {
             }
         }
 
-        // Wire up how to play panel back button
         if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
             howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlay());
         }
+
+        highScoreService = new HighScoreService();
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
@@ -556,7 +569,7 @@ public class GuiController implements Initializable {
         scoreLabel.textProperty().bind(integerProperty.asString("%d"));
     }
 
-    public void bindLines(IntegerProperty integerProperty) {
+    public void bindLines(IntegerProperty integerProperty, SoundController soundController) {
         linesLabel.textProperty().bind(integerProperty.asString("%d"));
 
         int initialLines = integerProperty.get();
@@ -567,12 +580,19 @@ public class GuiController implements Initializable {
         }
 
         integerProperty.addListener((obs, oldVal, newVal) -> {
-            int lines = newVal.intValue();
-            int level = (lines / 10) + 1;
-            levelLabel.setText(String.valueOf(level));
+            int oldLines = oldVal.intValue();
+            int newLines = newVal.intValue();
+            int oldLevel = (oldLines / 10) + 1;
+            int newLevel = (newLines / 10) + 1;
+            
+            levelLabel.setText(String.valueOf(newLevel));
 
             if (animationController != null) {
-                animationController.updateSpeed(level);
+                animationController.updateSpeed(newLevel);
+            }
+            
+            if (soundController != null && newLevel > oldLevel) {
+                soundController.playLevelUp();
             }
         });
     }
@@ -634,18 +654,38 @@ public class GuiController implements Initializable {
         }
     }
 
-    public void gameOver() {
+    public void gameOver(SoundController soundController) {
         hideGhostPiece();
         if (brickPanel != null) {
             brickPanel.setVisible(false);
         }
 
-        // Set final score from current score label
         try {
             int finalScore = Integer.parseInt(scoreLabel.getText());
             gameOverPanel.setFinalScore(finalScore);
+            
+            if (highScoreService != null) {
+                boolean isNewHighScore = highScoreService.updateHighScore(finalScore);
+                gameOverPanel.setHighScore(highScoreService.getHighScore());
+                
+                if (soundController != null) {
+                    if (isNewHighScore) {
+                        soundController.playHighScore();
+                    } else {
+                        soundController.playGameOver();
+                    }
+                }
+            } else if (soundController != null) {
+                soundController.playGameOver();
+            }
         } catch (NumberFormatException e) {
             gameOverPanel.setFinalScore(0);
+            if (highScoreService != null) {
+                gameOverPanel.setHighScore(highScoreService.getHighScore());
+            }
+            if (soundController != null) {
+                soundController.playGameOver();
+            }
         }
 
         if (gameOverOverlay != null) {
@@ -721,6 +761,61 @@ public class GuiController implements Initializable {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
         }
+    }
+
+    public void showCountdown(SoundController soundController, Runnable onComplete) {
+        if (countdownOverlay == null || countdownLabel == null) {
+            if (onComplete != null) {
+                onComplete.run();
+            }
+            return;
+        }
+
+        countdownOverlay.setVisible(true);
+        countdownLabel.setVisible(true);
+
+        Timeline countdownTimeline = new Timeline();
+        String[] countdownTexts = {"3", "2", "1", "GO!"};
+
+        for (int i = 0; i < countdownTexts.length; i++) {
+            final int index = i;
+            KeyFrame keyFrame = new KeyFrame(
+                Duration.millis(i * 1000),
+                e -> {
+                    countdownLabel.setText(countdownTexts[index]);
+                    countdownLabel.setOpacity(1.0);
+                    countdownLabel.setScaleX(1.5);
+                    countdownLabel.setScaleY(1.5);
+
+                    FadeTransition fadeOut = new FadeTransition(Duration.millis(800), countdownLabel);
+                    fadeOut.setFromValue(1.0);
+                    fadeOut.setToValue(0.0);
+
+                    javafx.animation.ScaleTransition scaleDown = new javafx.animation.ScaleTransition(Duration.millis(800), countdownLabel);
+                    scaleDown.setFromX(1.5);
+                    scaleDown.setFromY(1.5);
+                    scaleDown.setToX(1.0);
+                    scaleDown.setToY(1.0);
+
+                    ParallelTransition transition = new ParallelTransition(fadeOut, scaleDown);
+                    transition.play();
+                }
+            );
+            countdownTimeline.getKeyFrames().add(keyFrame);
+        }
+
+        KeyFrame hideFrame = new KeyFrame(
+            Duration.millis(countdownTexts.length * 1000),
+            e -> {
+                countdownOverlay.setVisible(false);
+                if (onComplete != null) {
+                    onComplete.run();
+                }
+            }
+        );
+        countdownTimeline.getKeyFrames().add(hideFrame);
+
+        countdownTimeline.play();
     }
 
     public void openSettings(ActionEvent actionEvent) {

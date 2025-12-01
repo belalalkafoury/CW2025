@@ -18,6 +18,7 @@ import javafx.util.Duration;
 public class GameOverPanel extends StackPane {
     private Label gameOverLabel;
     private Label finalScoreLabel;
+    private Label highScoreLabel;
     private Button playAgainButton;
     private Button mainMenuButton;
     private VBox menuPanel;
@@ -62,6 +63,14 @@ public class GameOverPanel extends StackPane {
             "-fx-font-family: \"Let's go Digital\";" +
             "-fx-font-size: 18px;" +
             "-fx-text-fill: white;" +
+            "-fx-font-weight: bold;"
+        );
+        
+        highScoreLabel = new Label("👑 HIGH SCORE: 0");
+        highScoreLabel.setStyle(
+            "-fx-font-family: \"Let's go Digital\";" +
+            "-fx-font-size: 18px;" +
+            "-fx-text-fill: #FFD700;" +
             "-fx-font-weight: bold;"
         );
         
@@ -166,7 +175,7 @@ public class GameOverPanel extends StackPane {
         });
         
         buttonsBox.getChildren().addAll(playAgainButton, mainMenuButton);
-        menuPanel.getChildren().addAll(gameOverLabel, finalScoreLabel, buttonsBox);
+        menuPanel.getChildren().addAll(gameOverLabel, finalScoreLabel, highScoreLabel, buttonsBox);
         
         getChildren().add(menuPanel);
     }
@@ -195,6 +204,12 @@ public class GameOverPanel extends StackPane {
         this.finalScore = score;
         if (finalScoreLabel != null) {
             finalScoreLabel.setText("FINAL SCORE: " + score);
+        }
+    }
+
+    public void setHighScore(int highScore) {
+        if (highScoreLabel != null) {
+            highScoreLabel.setText("👑 HIGH SCORE: " + highScore);
         }
     }
 

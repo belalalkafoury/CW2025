@@ -51,9 +51,13 @@ public class MainMenuController implements Initializable {
 
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
+    private SoundController soundController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        soundController = new SoundController();
+        soundController.playTitleMusic();
+        
         if (animationContainer != null) {
             animationController = new MainMenuAnimationController(animationContainer);
             animationController.start();
@@ -89,7 +93,7 @@ public class MainMenuController implements Initializable {
             guiController.setPrimaryStage(primaryStage);
 
             Board board = new GameBoard(25, 10);
-            new GameController(guiController, board);
+            new GameController(guiController, board, soundController);
         } catch (Exception e) {
             e.printStackTrace();
         }
