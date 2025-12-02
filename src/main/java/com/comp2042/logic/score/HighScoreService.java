@@ -53,5 +53,9 @@ public class HighScoreService {
         highScore = 0;
         saveHighScore();
     }
+
+    public void resetHighScore() {
+        reset();
+    }
 }
 

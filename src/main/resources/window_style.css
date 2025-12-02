@@ -214,7 +214,7 @@
 
 .pause-button-resume {
     -fx-border-width: 2px;
-    -fx-border-color: #00FFFF;
+    -fx-border-color: #BF5FFF;
     -fx-border-radius: 6px;
     -fx-background-color: rgba(0, 0, 0, 0.8);
     -fx-background-radius: 6px;
@@ -228,13 +228,13 @@
 }
 
 .pause-button-resume:hover {
-    -fx-background-color: rgba(0, 255, 255, 0.2);
-    -fx-border-color: #00FFFF;
+    -fx-background-color: rgba(191, 95, 255, 0.2);
+    -fx-border-color: #BF5FFF;
 }
 
 .pause-button-howto {
     -fx-border-width: 2px;
-    -fx-border-color: #FFFF00;
+    -fx-border-color: #00FFFF;
     -fx-border-radius: 6px;
     -fx-background-color: rgba(0, 0, 0, 0.8);
     -fx-background-radius: 6px;
@@ -248,13 +248,13 @@
 }
 
 .pause-button-howto:hover {
-    -fx-background-color: rgba(255, 255, 0, 0.2);
-    -fx-border-color: #FFFF00;
+    -fx-background-color: rgba(0, 255, 255, 0.2);
+    -fx-border-color: #00FFFF;
 }
 
 .pause-button-settings {
     -fx-border-width: 2px;
-    -fx-border-color: #FFA500;
+    -fx-border-color: #FFFF00;
     -fx-border-radius: 6px;
     -fx-background-color: rgba(0, 0, 0, 0.8);
     -fx-background-radius: 6px;
@@ -268,8 +268,8 @@
 }
 
 .pause-button-settings:hover {
-    -fx-background-color: rgba(255, 165, 0, 0.2);
-    -fx-border-color: #FFA500;
+    -fx-background-color: rgba(255, 255, 0, 0.2);
+    -fx-border-color: #FFFF00;
 }
 
 .pause-button-menu {
@@ -299,4 +299,36 @@
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, #BF5FFF, 10, 1.0, 0, 0);
     -fx-alignment: center;
+}
+
+.volume-button {
+    -fx-border-width: 2px;
+    -fx-border-color: #00FFFF;
+    -fx-border-radius: 4px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 4px;
+    -fx-text-fill: #00FFFF;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.volume-button:hover {
+    -fx-background-color: rgba(0, 255, 255, 0.2);
+    -fx-border-color: #6FCCFF;
+}
+
+.yellow-neon-button {
+    -fx-border-color: #FFFF00;
+    -fx-text-fill: #FFFF00;
+    -fx-font-family: "Press Start 2P";
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-border-width: 2px;
+    -fx-border-radius: 6px;
+    -fx-cursor: hand;
+}
+
+.yellow-neon-button:hover {
+    -fx-background-color: rgba(255, 255, 0, 0.2);
 }

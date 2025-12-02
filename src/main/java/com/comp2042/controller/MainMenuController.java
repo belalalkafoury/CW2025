@@ -3,7 +3,9 @@ package com.comp2042.controller;
 import com.comp2042.model.Board;
 import com.comp2042.model.GameBoard;
 import com.comp2042.view.HowToPlayPanel;
+import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.TetrisLogo;
+import com.comp2042.logic.score.HighScoreService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -49,14 +51,22 @@ public class MainMenuController implements Initializable {
     @FXML
     private HowToPlayPanel howToPlayPanel;
 
+    @FXML
+    private Group settingsOverlay;
+
+    @FXML
+    private SettingsPanel settingsPanel;
+
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
     private SoundController soundController;
+    private HighScoreService highScoreService;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         soundController = new SoundController();
         soundController.playTitleMusic();
+        highScoreService = new HighScoreService();
         
         if (animationContainer != null) {
             animationController = new MainMenuAnimationController(animationContainer);
@@ -67,6 +77,16 @@ public class MainMenuController implements Initializable {
         }
         if (howToPlayPanel != null && howToPlayPanel.getBackButton() != null) {
             howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlayFromMenu());
+        }
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(false);
+        }
+        if (settingsPanel != null) {
+            settingsPanel.setSoundController(soundController);
+            settingsPanel.setHighScoreService(highScoreService);
+            if (settingsPanel.getDoneButton() != null) {
+                settingsPanel.getDoneButton().setOnAction(e -> hideSettingsFromMenu());
+            }
         }
     }
 
@@ -101,6 +121,12 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void openSettings(ActionEvent event) {
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(true);
+            if (settingsPanel != null) {
+                settingsPanel.playAnimation();
+            }
+        }
     }
 
     @FXML
@@ -121,6 +147,12 @@ public class MainMenuController implements Initializable {
     private void hideHowToPlayFromMenu() {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
+        }
+    }
+
+    private void hideSettingsFromMenu() {
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(false);
         }
     }
 }

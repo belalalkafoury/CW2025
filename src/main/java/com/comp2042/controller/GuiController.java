@@ -6,6 +6,7 @@ import com.comp2042.model.Board;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.NotificationPanel;
+import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.ViewData;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -101,6 +102,12 @@ public class GuiController implements Initializable {
     @FXML
     private Label countdownLabel;
 
+    @FXML
+    private Group settingsOverlay;
+
+    @FXML
+    private SettingsPanel settingsPanel;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -128,6 +135,8 @@ public class GuiController implements Initializable {
     private Stage primaryStage;
 
     private HighScoreService highScoreService;
+
+    private SoundController soundController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -188,7 +197,18 @@ public class GuiController implements Initializable {
             howToPlayPanel.getBackButton().setOnAction(e -> hideHowToPlay());
         }
 
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(false);
+        }
+
         highScoreService = new HighScoreService();
+
+        if (settingsPanel != null) {
+            settingsPanel.setHighScoreService(highScoreService);
+            if (settingsPanel.getDoneButton() != null) {
+                settingsPanel.getDoneButton().setOnAction(e -> hideSettings());
+            }
+        }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
@@ -319,7 +339,14 @@ public class GuiController implements Initializable {
             
             updateGhostPiece(brick);
             
-            if (brickPanel.getParent() != null) {
+            if (brickPanel.getParent() != null && 
+                !isPause.get() && 
+                !isGameOver.get() &&
+                (pauseMenuOverlay == null || !pauseMenuOverlay.isVisible()) &&
+                (howToPlayOverlay == null || !howToPlayOverlay.isVisible()) &&
+                (settingsOverlay == null || !settingsOverlay.isVisible()) &&
+                (gameOverOverlay == null || !gameOverOverlay.isVisible()) &&
+                (countdownOverlay == null || !countdownOverlay.isVisible())) {
                 brickPanel.toFront();
             }
             
@@ -345,6 +372,11 @@ public class GuiController implements Initializable {
 
     private void updateGhostPiece(ViewData brick) {
         if (board == null || ghostPanel == null || ghostRectangles == null) {
+            return;
+        }
+
+        if (!com.comp2042.model.GameSettings.isShowGhostPiece()) {
+            ghostPanel.setVisible(false);
             return;
         }
 
@@ -451,6 +483,13 @@ public class GuiController implements Initializable {
 
     public void animateClear(List<Integer> rows, Runnable onFinished) {
         if (rows == null || rows.isEmpty() || displayMatrix == null) {
+            if (onFinished != null) {
+                onFinished.run();
+            }
+            return;
+        }
+
+        if (!com.comp2042.model.GameSettings.isShowAnimations()) {
             if (onFinished != null) {
                 onFinished.run();
             }
@@ -570,6 +609,10 @@ public class GuiController implements Initializable {
     }
 
     public void bindLines(IntegerProperty integerProperty, SoundController soundController) {
+        this.soundController = soundController;
+        if (settingsPanel != null) {
+            settingsPanel.setSoundController(soundController);
+        }
         linesLabel.textProperty().bind(integerProperty.asString("%d"));
 
         int initialLines = integerProperty.get();
@@ -690,6 +733,7 @@ public class GuiController implements Initializable {
 
         if (gameOverOverlay != null) {
             gameOverOverlay.setVisible(true);
+            gameOverOverlay.toFront();
         }
         gameOverPanel.playAnimation();
         isGameOver.setValue(Boolean.TRUE);
@@ -716,6 +760,7 @@ public class GuiController implements Initializable {
             }
             if (pauseMenuOverlay != null) {
                 pauseMenuOverlay.setVisible(true);
+                pauseMenuOverlay.toFront();
             }
             if (animationController != null) {
                 animationController.pause();
@@ -751,6 +796,7 @@ public class GuiController implements Initializable {
     public void showHowToPlay(ActionEvent actionEvent) {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(true);
+            howToPlayOverlay.toFront();
             if (howToPlayPanel != null) {
                 howToPlayPanel.playAnimation();
             }
@@ -772,6 +818,7 @@ public class GuiController implements Initializable {
         }
 
         countdownOverlay.setVisible(true);
+        countdownOverlay.toFront();
         countdownLabel.setVisible(true);
 
         Timeline countdownTimeline = new Timeline();
@@ -819,7 +866,19 @@ public class GuiController implements Initializable {
     }
 
     public void openSettings(ActionEvent actionEvent) {
-        System.out.println("Settings (placeholder)");
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(true);
+            settingsOverlay.toFront();
+            if (settingsPanel != null) {
+                settingsPanel.playAnimation();
+            }
+        }
+    }
+
+    private void hideSettings() {
+        if (settingsOverlay != null) {
+            settingsOverlay.setVisible(false);
+        }
     }
 
     public void returnToMainMenu(ActionEvent actionEvent) {
