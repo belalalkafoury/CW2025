@@ -1,5 +1,6 @@
 <?import com.comp2042.view.TetrisLogo?>
 <?import com.comp2042.view.HowToPlayPanel?>
+<?import com.comp2042.view.SettingsPanel?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -65,6 +66,13 @@
 
     <Group fx:id="howToPlayOverlay" visible="false" layoutX="0" layoutY="0">
         <HowToPlayPanel fx:id="howToPlayPanel" layoutX="0" layoutY="0"/>
+    </Group>
+
+    <Group fx:id="settingsOverlay" visible="false" layoutX="0" layoutY="0">
+        <Rectangle width="700" height="600" styleClass="pause-dim-background"/>
+        <StackPane alignment="CENTER" prefWidth="700" prefHeight="600">
+            <SettingsPanel fx:id="settingsPanel"/>
+        </StackPane>
     </Group>
 
     <stylesheets>

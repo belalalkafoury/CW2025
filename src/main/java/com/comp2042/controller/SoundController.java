@@ -19,9 +19,13 @@ public class SoundController {
     private MediaPlayer titleMusicPlayer;
     
     private boolean isMuted = false;
+    private double soundVolume = 1.0;
+    private double musicVolume = 1.0;
 
     public SoundController() {
         loadSounds();
+        soundVolume = com.comp2042.model.GameSettings.getSoundVolume();
+        musicVolume = com.comp2042.model.GameSettings.getMusicVolume();
     }
 
     private void loadSounds() {
@@ -63,54 +67,63 @@ public class SoundController {
 
     public void playMove() {
         if (!isMuted && moveSound != null) {
+            moveSound.setVolume(soundVolume);
             moveSound.play();
         }
     }
 
     public void playRotate() {
         if (!isMuted && rotateSound != null) {
+            rotateSound.setVolume(soundVolume);
             rotateSound.play();
         }
     }
 
     public void playHardDrop() {
         if (!isMuted && hardDropSound != null) {
+            hardDropSound.setVolume(soundVolume);
             hardDropSound.play();
         }
     }
 
     public void playLineClear() {
         if (!isMuted && lineClearSound != null) {
+            lineClearSound.setVolume(soundVolume);
             lineClearSound.play();
         }
     }
 
     public void playGameOver() {
         if (!isMuted && gameOverSound != null) {
+            gameOverSound.setVolume(soundVolume);
             gameOverSound.play();
         }
     }
 
     public void playHighScore() {
         if (!isMuted && highScoreSound != null) {
+            highScoreSound.setVolume(soundVolume);
             highScoreSound.play();
         }
     }
 
     public void playLevelUp() {
         if (!isMuted && levelUpSound != null) {
+            levelUpSound.setVolume(soundVolume);
             levelUpSound.play();
         }
     }
 
     public void playCountdown() {
         if (!isMuted && countdownSound != null) {
+            countdownSound.setVolume(soundVolume);
             countdownSound.play();
         }
     }
 
     public void playTitleMusic() {
         if (!isMuted && titleMusicPlayer != null) {
+            titleMusicPlayer.setVolume(musicVolume);
             titleMusicPlayer.play();
         }
     }
@@ -132,6 +145,33 @@ public class SoundController {
 
     public boolean isMuted() {
         return isMuted;
+    }
+
+    public void setSoundVolume(double volume) {
+        this.soundVolume = Math.max(0.0, Math.min(1.0, volume));
+        if (moveSound != null) moveSound.setVolume(soundVolume);
+        if (rotateSound != null) rotateSound.setVolume(soundVolume);
+        if (hardDropSound != null) hardDropSound.setVolume(soundVolume);
+        if (lineClearSound != null) lineClearSound.setVolume(soundVolume);
+        if (gameOverSound != null) gameOverSound.setVolume(soundVolume);
+        if (highScoreSound != null) highScoreSound.setVolume(soundVolume);
+        if (levelUpSound != null) levelUpSound.setVolume(soundVolume);
+        if (countdownSound != null) countdownSound.setVolume(soundVolume);
+    }
+
+    public void setMusicVolume(double volume) {
+        this.musicVolume = Math.max(0.0, Math.min(1.0, volume));
+        if (titleMusicPlayer != null) {
+            titleMusicPlayer.setVolume(musicVolume);
+        }
+    }
+
+    public double getSoundVolume() {
+        return soundVolume;
+    }
+
+    public double getMusicVolume() {
+        return musicVolume;
     }
 }
 
