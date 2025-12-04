@@ -272,6 +272,26 @@
     -fx-border-color: #FFFF00;
 }
 
+.pause-button-change-mode {
+    -fx-border-width: 2px;
+    -fx-border-color: #BF5FFF;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.pause-button-change-mode:hover {
+    -fx-background-color: rgba(191, 95, 255, 0.2);
+    -fx-border-color: #BF5FFF;
+}
+
 .pause-button-menu {
     -fx-border-width: 2px;
     -fx-border-color: #5FAFFF;
@@ -331,4 +351,45 @@
 
 .yellow-neon-button:hover {
     -fx-background-color: rgba(255, 255, 0, 0.2);
+}
+
+.game-mode-title {
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 24px;
+    -fx-text-fill: #00FFFF;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #BF5FFF, 8, 0.8, 0, 0);
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+.mode-back-button {
+    -fx-border-width: 2px;
+    -fx-border-color: #00FFFF;
+    -fx-border-radius: 6px;
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-radius: 6px;
+    -fx-text-fill: white;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 220px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+
+.mode-back-button:hover {
+    -fx-background-color: rgba(0, 255, 255, 0.2);
+    -fx-border-color: #BF5FFF;
+}
+
+.mode-image-button {
+    -fx-padding: 0;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-border-insets: 0;
+    -fx-margin: 0;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }

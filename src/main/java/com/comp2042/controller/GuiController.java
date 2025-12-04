@@ -3,6 +3,7 @@ package com.comp2042.controller;
 import com.comp2042.logic.board.DownData;
 import com.comp2042.logic.score.HighScoreService;
 import com.comp2042.model.Board;
+import com.comp2042.view.GameModePanel;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.NotificationPanel;
@@ -108,6 +109,12 @@ public class GuiController implements Initializable {
     @FXML
     private SettingsPanel settingsPanel;
 
+    @FXML
+    private Group gameModeOverlay;
+
+    @FXML
+    private GameModePanel gameModePanel;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -208,6 +215,21 @@ public class GuiController implements Initializable {
             if (settingsPanel.getDoneButton() != null) {
                 settingsPanel.getDoneButton().setOnAction(e -> hideSettings());
             }
+        }
+
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(false);
+        }
+
+        if (gameModePanel != null) {
+            gameModePanel.setClassicAction(() -> {
+                hideGameModeSelection();
+                resumeGame(null);
+            });
+            gameModePanel.setTimeAttackAction(() -> {});
+            gameModePanel.setPuzzleAction(() -> {});
+            gameModePanel.setRevertedAction(() -> {});
+            gameModePanel.setBackAction(() -> hideGameModeSelection());
         }
     }
 
@@ -806,6 +828,30 @@ public class GuiController implements Initializable {
     public void hideHowToPlay() {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
+        }
+    }
+
+    @FXML
+    public void showGameModeSelection(ActionEvent actionEvent) {
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(false);
+        }
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(true);
+            gameModeOverlay.toFront();
+            if (gameModePanel != null) {
+                gameModePanel.playAnimation();
+            }
+        }
+    }
+
+    private void hideGameModeSelection() {
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(false);
+        }
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(true);
+            pauseMenuOverlay.toFront();
         }
     }
 

@@ -5,6 +5,7 @@ import com.comp2042.model.GameBoard;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.TetrisLogo;
+import com.comp2042.view.GameModePanel;
 import com.comp2042.logic.score.HighScoreService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -57,6 +58,12 @@ public class MainMenuController implements Initializable {
     @FXML
     private SettingsPanel settingsPanel;
 
+    @FXML
+    private Group gameModeOverlay;
+
+    @FXML
+    private GameModePanel gameModePanel;
+
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
     private SoundController soundController;
@@ -88,6 +95,15 @@ public class MainMenuController implements Initializable {
                 settingsPanel.getDoneButton().setOnAction(e -> hideSettingsFromMenu());
             }
         }
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(false);
+        }
+        if (gameModePanel != null) {
+            gameModePanel.setClassicAction(this::startGameInternal);
+            gameModePanel.setTimeAttackAction(() -> {});
+            gameModePanel.setPuzzleAction(() -> {});
+            gameModePanel.setRevertedAction(() -> {});
+        }
     }
 
     public void setPrimaryStage(Stage stage) {
@@ -95,7 +111,17 @@ public class MainMenuController implements Initializable {
     }
     
     @FXML
-    private void startGame(ActionEvent event) {
+    private void showGameModeSelection(ActionEvent event) {
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(true);
+            gameModeOverlay.toFront();
+            if (gameModePanel != null) {
+                gameModePanel.playAnimation();
+            }
+        }
+    }
+
+    private void startGameInternal() {
         if (animationController != null) {
             animationController.stop();
         }
@@ -117,6 +143,11 @@ public class MainMenuController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void startGame(ActionEvent event) {
+        startGameInternal();
     }
 
     @FXML
