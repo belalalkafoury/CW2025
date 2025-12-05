@@ -50,7 +50,7 @@ public class GameController implements InputEventListener {
 
         board.createNewBrick();
         viewGuiController.setEventListener(this);
-        this.inputHandler = new InputHandler(this);
+        this.inputHandler = new InputHandler(this, this.gameMode);
         viewGuiController.setInputHandler(this.inputHandler);
         viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.setBoard(board);
