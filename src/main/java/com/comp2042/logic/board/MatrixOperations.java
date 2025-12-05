@@ -123,4 +123,20 @@ public class MatrixOperations {
         return list.stream().map(MatrixOperations::copy).collect(Collectors.toList());
     }
 
+    public static int[][] generateGarbage(int width, int height, int garbageHeight) {
+        int[][] matrix = new int[width][height];
+        java.util.Random random = new java.util.Random();
+        
+        for (int row = width - 1; row >= width - garbageHeight && row >= 0; row--) {
+            for (int col = 0; col < height; col++) {
+                matrix[row][col] = 1 + random.nextInt(7);
+            }
+            
+            int emptyCol = random.nextInt(height);
+            matrix[row][emptyCol] = 0;
+        }
+        
+        return matrix;
+    }
+
 }

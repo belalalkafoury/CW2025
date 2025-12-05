@@ -2,9 +2,11 @@ package com.comp2042.controller;
 
 import com.comp2042.model.Board;
 import com.comp2042.model.GameBoard;
+import com.comp2042.model.GameMode;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.TetrisLogo;
+import com.comp2042.view.GameModePanel;
 import com.comp2042.logic.score.HighScoreService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -57,6 +59,12 @@ public class MainMenuController implements Initializable {
     @FXML
     private SettingsPanel settingsPanel;
 
+    @FXML
+    private Group gameModeOverlay;
+
+    @FXML
+    private GameModePanel gameModePanel;
+
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
     private SoundController soundController;
@@ -88,6 +96,15 @@ public class MainMenuController implements Initializable {
                 settingsPanel.getDoneButton().setOnAction(e -> hideSettingsFromMenu());
             }
         }
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(false);
+        }
+        if (gameModePanel != null) {
+            gameModePanel.setClassicAction(() -> startGameWithMode(GameMode.CLASSIC));
+            gameModePanel.setTimeAttackAction(() -> startGameWithMode(GameMode.TIME_ATTACK));
+            gameModePanel.setPuzzleAction(() -> startGameWithMode(GameMode.PUZZLE));
+            gameModePanel.setRevertedAction(() -> startGameWithMode(GameMode.REVERTED));
+        }
     }
 
     public void setPrimaryStage(Stage stage) {
@@ -95,7 +112,17 @@ public class MainMenuController implements Initializable {
     }
     
     @FXML
-    private void startGame(ActionEvent event) {
+    private void showGameModeSelection(ActionEvent event) {
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(true);
+            gameModeOverlay.toFront();
+            if (gameModePanel != null) {
+                gameModePanel.playAnimation();
+            }
+        }
+    }
+
+    private void startGameWithMode(GameMode gameMode) {
         if (animationController != null) {
             animationController.stop();
         }
@@ -113,10 +140,19 @@ public class MainMenuController implements Initializable {
             guiController.setPrimaryStage(primaryStage);
 
             Board board = new GameBoard(25, 10);
-            new GameController(guiController, board, soundController);
+            new GameController(guiController, board, soundController, gameMode);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void startGameInternal() {
+        startGameWithMode(GameMode.CLASSIC);
+    }
+
+    @FXML
+    private void startGame(ActionEvent event) {
+        startGameInternal();
     }
 
     @FXML

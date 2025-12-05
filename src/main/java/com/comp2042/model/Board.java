@@ -36,4 +36,6 @@ public interface Board {
     int hardDrop();
     
     java.util.List<Integer> getRowsToClear();
+    
+    void setupPuzzleMode();
 }

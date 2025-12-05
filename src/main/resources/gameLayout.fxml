@@ -1,6 +1,7 @@
 <?import com.comp2042.view.GameOverPanel?>
 <?import com.comp2042.view.HowToPlayPanel?>
 <?import com.comp2042.view.SettingsPanel?>
+<?import com.comp2042.view.GameModePanel?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
@@ -36,15 +37,15 @@
             <center>
                 <VBox alignment="CENTER" spacing="15" styleClass="stats-container">
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="SCORE" styleClass="stats-label"/>
+                        <Label fx:id="scoreHeaderLabel" text="SCORE" styleClass="stats-label"/>
                         <Label fx:id="scoreLabel" text="0" styleClass="stats-value"/>
                     </VBox>
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="LEVEL" styleClass="stats-label"/>
+                        <Label fx:id="levelHeaderLabel" text="LEVEL" styleClass="stats-label"/>
                         <Label fx:id="levelLabel" text="1" styleClass="stats-value"/>
                     </VBox>
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="LINES" styleClass="stats-label"/>
+                        <Label fx:id="linesHeaderLabel" text="LINES" styleClass="stats-label"/>
                         <Label fx:id="linesLabel" text="0" styleClass="stats-value"/>
                     </VBox>
                 </VBox>
@@ -102,6 +103,7 @@
                 <Button text="RESUME" onAction="#resumeGame" styleClass="pause-button-resume"/>
                 <Button text="HOW TO PLAY" onAction="#showHowToPlay" styleClass="pause-button-howto"/>
                 <Button text="SETTINGS" onAction="#openSettings" styleClass="pause-button-settings"/>
+                <Button text="CHANGE MODE" onAction="#showGameModeSelection" styleClass="pause-button-change-mode"/>
                 <Button text="RETURN TO MAIN MENU" onAction="#returnToMainMenu" styleClass="pause-button-menu"/>
             </VBox>
         </VBox>
@@ -123,6 +125,10 @@
         <StackPane alignment="CENTER" prefWidth="700" prefHeight="600">
             <SettingsPanel fx:id="settingsPanel"/>
         </StackPane>
+    </Group>
+
+    <Group fx:id="gameModeOverlay" visible="false" layoutX="0" layoutY="0">
+        <GameModePanel fx:id="gameModePanel"/>
     </Group>
 
     <stylesheets>
