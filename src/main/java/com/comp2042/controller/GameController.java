@@ -61,6 +61,11 @@ public class GameController implements InputEventListener {
         
         if (gameMode == GameMode.TIME_ATTACK) {
             initializeTimeAttackMode();
+        } else if (gameMode == GameMode.PUZZLE) {
+            board.setupPuzzleMode();
+            viewGuiController.configurePuzzleMode(40);
+            viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
+            viewGuiController.refreshGameBackground(board.getBoardMatrix());
         } else {
             viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
         }
@@ -68,6 +73,14 @@ public class GameController implements InputEventListener {
         board.getScore().scoreProperty().addListener((obs, oldVal, newVal) -> {
             if (isTimeAttackActive && !gameWon && !gameLost) {
                 checkWinCondition(newVal.intValue());
+            }
+        });
+
+        board.getScore().linesProperty().addListener((obs, oldVal, newVal) -> {
+            if (gameMode == GameMode.PUZZLE && !gameWon && !gameLost) {
+                if (newVal.intValue() >= 40) {
+                    checkPuzzleWinCondition();
+                }
             }
         });
 
@@ -176,6 +189,10 @@ public class GameController implements InputEventListener {
         
         if (gameMode == GameMode.TIME_ATTACK) {
             initializeTimeAttackMode();
+        } else if (gameMode == GameMode.PUZZLE) {
+            board.setupPuzzleMode();
+            viewGuiController.configurePuzzleMode(40);
+            viewGuiController.refreshGameBackground(board.getBoardMatrix());
         }
         
         if (soundController != null) {
@@ -292,6 +309,19 @@ public class GameController implements InputEventListener {
             stopGameTimer();
             animationController.stop();
             viewGuiController.gameOver(soundController);
+        }
+    }
+
+    private void checkPuzzleWinCondition() {
+        if (board.getScore().getLinesValue() >= 40 && !gameWon && !gameLost) {
+            gameWon = true;
+            animationController.stop();
+            
+            if (soundController != null) {
+                soundController.playLevelUp();
+            }
+            
+            viewGuiController.gameWin(soundController);
         }
     }
 

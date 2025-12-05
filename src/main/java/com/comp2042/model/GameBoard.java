@@ -156,6 +156,14 @@ public class GameBoard implements Board {
         score.reset();
         createNewBrick();
     }
+
+    public void setupPuzzleMode() {
+        currentGameMatrix = MatrixOperations.generateGarbage(width, height, 10);
+        currentBrick = null;
+        nextBrick = null;
+        createNewBrick();
+    }
+
     private static Point translated(Point p, int dx, int dy) {
         Point np = new Point(p);
         np.translate(dx, dy);

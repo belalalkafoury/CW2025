@@ -699,6 +699,19 @@ public class GuiController implements Initializable {
         }
     }
 
+    public void configurePuzzleMode(int lineGoal) {
+        if (levelHeaderLabel != null) {
+            levelHeaderLabel.setText("GOAL");
+        }
+        if (levelLabel != null) {
+            levelLabel.textProperty().unbind();
+            levelLabel.setText(String.valueOf(lineGoal));
+        }
+        if (linesHeaderLabel != null) {
+            linesHeaderLabel.setText("DONE");
+        }
+    }
+
     private void restoreClassicModeLabels() {
         if (levelHeaderLabel != null) {
             levelHeaderLabel.setText("LEVEL");
@@ -743,7 +756,7 @@ public class GuiController implements Initializable {
             board = new GameBoard(25, 10);
         }
 
-        if (newMode != GameMode.TIME_ATTACK) {
+        if (newMode != GameMode.TIME_ATTACK && newMode != GameMode.PUZZLE) {
             restoreClassicModeLabels();
         }
 
