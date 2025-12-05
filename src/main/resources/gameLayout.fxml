@@ -37,15 +37,15 @@
             <center>
                 <VBox alignment="CENTER" spacing="15" styleClass="stats-container">
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="SCORE" styleClass="stats-label"/>
+                        <Label fx:id="scoreHeaderLabel" text="SCORE" styleClass="stats-label"/>
                         <Label fx:id="scoreLabel" text="0" styleClass="stats-value"/>
                     </VBox>
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="LEVEL" styleClass="stats-label"/>
+                        <Label fx:id="levelHeaderLabel" text="LEVEL" styleClass="stats-label"/>
                         <Label fx:id="levelLabel" text="1" styleClass="stats-value"/>
                     </VBox>
                     <VBox alignment="CENTER" spacing="5">
-                        <Label text="LINES" styleClass="stats-label"/>
+                        <Label fx:id="linesHeaderLabel" text="LINES" styleClass="stats-label"/>
                         <Label fx:id="linesLabel" text="0" styleClass="stats-value"/>
                     </VBox>
                 </VBox>

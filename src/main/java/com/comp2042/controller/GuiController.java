@@ -3,6 +3,8 @@ package com.comp2042.controller;
 import com.comp2042.logic.board.DownData;
 import com.comp2042.logic.score.HighScoreService;
 import com.comp2042.model.Board;
+import com.comp2042.model.GameBoard;
+import com.comp2042.model.GameMode;
 import com.comp2042.view.GameModePanel;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
@@ -71,10 +73,19 @@ public class GuiController implements Initializable {
     private Group gameOverOverlay;
 
     @FXML
+    private Label scoreHeaderLabel;
+
+    @FXML
     private Label scoreLabel;
 
     @FXML
+    private Label levelHeaderLabel;
+
+    @FXML
     private Label levelLabel;
+
+    @FXML
+    private Label linesHeaderLabel;
 
     @FXML
     private Label linesLabel;
@@ -118,6 +129,8 @@ public class GuiController implements Initializable {
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
+
+    private GameController gameController;
 
     private Rectangle[][] rectangles;
 
@@ -222,13 +235,10 @@ public class GuiController implements Initializable {
         }
 
         if (gameModePanel != null) {
-            gameModePanel.setClassicAction(() -> {
-                hideGameModeSelection();
-                resumeGame(null);
-            });
-            gameModePanel.setTimeAttackAction(() -> {});
-            gameModePanel.setPuzzleAction(() -> {});
-            gameModePanel.setRevertedAction(() -> {});
+            gameModePanel.setClassicAction(() -> changeGameMode(GameMode.CLASSIC));
+            gameModePanel.setTimeAttackAction(() -> changeGameMode(GameMode.TIME_ATTACK));
+            gameModePanel.setPuzzleAction(() -> changeGameMode(GameMode.PUZZLE));
+            gameModePanel.setRevertedAction(() -> changeGameMode(GameMode.REVERTED));
             gameModePanel.setBackAction(() -> hideGameModeSelection());
         }
     }
@@ -620,6 +630,9 @@ public class GuiController implements Initializable {
 
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
+        if (eventListener instanceof GameController) {
+            this.gameController = (GameController) eventListener;
+        }
     }
 
     public void setBoard(Board board) {
@@ -660,6 +673,84 @@ public class GuiController implements Initializable {
                 soundController.playLevelUp();
             }
         });
+    }
+
+    public void configureTimeAttackMode(int initialTime, int targetScore) {
+        if (levelHeaderLabel != null) {
+            levelHeaderLabel.setText("TIME");
+        }
+        if (linesHeaderLabel != null) {
+            linesHeaderLabel.setText("GOAL");
+        }
+        
+        if (linesLabel != null) {
+            linesLabel.textProperty().unbind();
+            linesLabel.setText(String.valueOf(targetScore));
+        }
+        updateTimer(initialTime);
+    }
+
+    public void updateTimer(int seconds) {
+        if (levelLabel != null) {
+            int minutes = seconds / 60;
+            int remainingSeconds = seconds % 60;
+            String timeString = String.format("%d:%02d", minutes, remainingSeconds);
+            levelLabel.setText(timeString);
+        }
+    }
+
+    private void restoreClassicModeLabels() {
+        if (levelHeaderLabel != null) {
+            levelHeaderLabel.setText("LEVEL");
+        }
+        if (linesHeaderLabel != null) {
+            linesHeaderLabel.setText("LINES");
+        }
+    }
+
+    private void changeGameMode(GameMode newMode) {
+        if (animationController != null) {
+            animationController.stop();
+        }
+        if (gameController != null) {
+            gameController.pauseTimer();
+        }
+
+        if (scoreLabel != null) {
+            scoreLabel.textProperty().unbind();
+        }
+        if (linesLabel != null) {
+            linesLabel.textProperty().unbind();
+        }
+
+        isPause.setValue(Boolean.FALSE);
+        isGameOver.setValue(Boolean.FALSE);
+        
+        hideGameModeSelection();
+        if (pauseMenuOverlay != null) {
+            pauseMenuOverlay.setVisible(false);
+        }
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(false);
+        }
+        if (brickPanel != null) {
+            brickPanel.setVisible(true);
+        }
+
+        if (board != null) {
+            board.newGame();
+        } else {
+            board = new GameBoard(25, 10);
+        }
+
+        if (newMode != GameMode.TIME_ATTACK) {
+            restoreClassicModeLabels();
+        }
+
+        gameController = new GameController(this, board, soundController, newMode);
+        
+        refreshGameBackground(board.getBoardMatrix());
+        gamePanel.requestFocus();
     }
 
     public void setAnimationController(AnimationController animationController) {
@@ -725,6 +816,10 @@ public class GuiController implements Initializable {
             brickPanel.setVisible(false);
         }
 
+        if (gameOverPanel != null) {
+            gameOverPanel.setMessage("GAME OVER");
+        }
+
         try {
             int finalScore = Integer.parseInt(scoreLabel.getText());
             gameOverPanel.setFinalScore(finalScore);
@@ -750,6 +845,39 @@ public class GuiController implements Initializable {
             }
             if (soundController != null) {
                 soundController.playGameOver();
+            }
+        }
+
+        if (gameOverOverlay != null) {
+            gameOverOverlay.setVisible(true);
+            gameOverOverlay.toFront();
+        }
+        gameOverPanel.playAnimation();
+        isGameOver.setValue(Boolean.TRUE);
+    }
+
+    public void gameWin(SoundController soundController) {
+        hideGhostPiece();
+        if (brickPanel != null) {
+            brickPanel.setVisible(false);
+        }
+
+        if (gameOverPanel != null) {
+            gameOverPanel.setMessage("YOU WIN");
+        }
+
+        try {
+            int finalScore = Integer.parseInt(scoreLabel.getText());
+            gameOverPanel.setFinalScore(finalScore);
+            
+            if (highScoreService != null) {
+                boolean isNewHighScore = highScoreService.updateHighScore(finalScore);
+                gameOverPanel.setHighScore(highScoreService.getHighScore());
+            }
+        } catch (NumberFormatException e) {
+            gameOverPanel.setFinalScore(0);
+            if (highScoreService != null) {
+                gameOverPanel.setHighScore(highScoreService.getHighScore());
             }
         }
 
@@ -787,6 +915,9 @@ public class GuiController implements Initializable {
             if (animationController != null) {
                 animationController.pause();
             }
+            if (gameController != null) {
+                gameController.pauseTimer();
+            }
         } else {
             if (pauseButton != null) {
                 pauseButton.setText("⏸");
@@ -796,6 +927,9 @@ public class GuiController implements Initializable {
             }
             if (animationController != null) {
                 animationController.resume();
+            }
+            if (gameController != null) {
+                gameController.resumeTimer();
             }
         }
         gamePanel.requestFocus();
@@ -811,6 +945,9 @@ public class GuiController implements Initializable {
         }
         if (animationController != null) {
             animationController.resume();
+        }
+        if (gameController != null) {
+            gameController.resumeTimer();
         }
         gamePanel.requestFocus();
     }

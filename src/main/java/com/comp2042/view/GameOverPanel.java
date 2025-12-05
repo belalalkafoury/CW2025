@@ -220,4 +220,10 @@ public class GameOverPanel extends StackPane {
     public Button getMainMenuButton() {
         return mainMenuButton;
     }
+
+    public void setMessage(String message) {
+        if (gameOverLabel != null) {
+            gameOverLabel.setText(message);
+        }
+    }
 }

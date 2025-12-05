@@ -2,6 +2,7 @@ package com.comp2042.controller;
 
 import com.comp2042.model.Board;
 import com.comp2042.model.GameBoard;
+import com.comp2042.model.GameMode;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.TetrisLogo;
@@ -99,10 +100,10 @@ public class MainMenuController implements Initializable {
             gameModeOverlay.setVisible(false);
         }
         if (gameModePanel != null) {
-            gameModePanel.setClassicAction(this::startGameInternal);
-            gameModePanel.setTimeAttackAction(() -> {});
-            gameModePanel.setPuzzleAction(() -> {});
-            gameModePanel.setRevertedAction(() -> {});
+            gameModePanel.setClassicAction(() -> startGameWithMode(GameMode.CLASSIC));
+            gameModePanel.setTimeAttackAction(() -> startGameWithMode(GameMode.TIME_ATTACK));
+            gameModePanel.setPuzzleAction(() -> startGameWithMode(GameMode.PUZZLE));
+            gameModePanel.setRevertedAction(() -> startGameWithMode(GameMode.REVERTED));
         }
     }
 
@@ -121,7 +122,7 @@ public class MainMenuController implements Initializable {
         }
     }
 
-    private void startGameInternal() {
+    private void startGameWithMode(GameMode gameMode) {
         if (animationController != null) {
             animationController.stop();
         }
@@ -139,10 +140,14 @@ public class MainMenuController implements Initializable {
             guiController.setPrimaryStage(primaryStage);
 
             Board board = new GameBoard(25, 10);
-            new GameController(guiController, board, soundController);
+            new GameController(guiController, board, soundController, gameMode);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void startGameInternal() {
+        startGameWithMode(GameMode.CLASSIC);
     }
 
     @FXML
