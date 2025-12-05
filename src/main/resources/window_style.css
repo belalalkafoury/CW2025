@@ -120,12 +120,12 @@
 }
 
 .next-pieces-container {
-    -fx-padding: 10px;
-    -fx-spacing: 15px;
+    -fx-padding: 5px;
+    -fx-spacing: 8px;
 }
 
 .next-piece-container {
-    -fx-padding: 5px;
+    -fx-padding: 3px;
 }
 
 .pause-button {

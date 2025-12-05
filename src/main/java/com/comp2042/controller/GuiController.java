@@ -50,6 +50,7 @@ import java.util.ResourceBundle;
 public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
+    private static final int NEXT_PIECE_BRICK_SIZE = 16;
 
     @FXML
     private GridPane gamePanel;
@@ -105,6 +106,12 @@ public class GuiController implements Initializable {
     private GridPane nextPiece1;
 
     @FXML
+    private GridPane nextPiece2;
+
+    @FXML
+    private GridPane nextPiece3;
+
+    @FXML
     private Button pauseButton;
 
     @FXML
@@ -148,7 +155,9 @@ public class GuiController implements Initializable {
 
     private Rectangle[][] rectangles;
 
-    private Rectangle[][] nextPieceRectangles;
+    private Rectangle[][] nextPiece1Rectangles;
+    private Rectangle[][] nextPiece2Rectangles;
+    private Rectangle[][] nextPiece3Rectangles;
 
     private Rectangle[][] ghostRectangles;
 
@@ -306,7 +315,7 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * cellSize);
         brickPanel.setLayoutY(gameBoardY - 42 + (brick.getyPosition() - 2) * cellSize);
 
-        initNextPiecePanel(brick);
+        updateNextPieces(brick.getNextPieces());
         initGhostPiece(brick);
     }
 
@@ -427,7 +436,7 @@ public class GuiController implements Initializable {
                     rectangles[i][j].setOpacity(1.0);
                 }
             }
-            updateNextPiecePanel(brick);
+            updateNextPieces(brick.getNextPieces());
         }
     }
 
@@ -803,55 +812,45 @@ public class GuiController implements Initializable {
         this.animationController = animationController;
     }
 
-    private void initNextPiecePanel(ViewData brick) {
-        if (nextPiece1 == null || brick == null) return;
+    private void updateNextPieces(List<int[][]> nextShapes) {
+        if (nextPiece1 == null || nextPiece2 == null || nextPiece3 == null || nextShapes == null) return;
 
-        nextPiece1.getChildren().clear();
+        GridPane[] grids = {nextPiece1, nextPiece2, nextPiece3};
 
-        int[][] nextBrickData = brick.getNextBrickData();
-        if (nextBrickData == null || nextBrickData.length == 0) return;
+        for (int pieceIndex = 0; pieceIndex < 3 && pieceIndex < nextShapes.size(); pieceIndex++) {
+            GridPane grid = grids[pieceIndex];
+            if (grid == null) continue;
 
-        nextPieceRectangles = new Rectangle[nextBrickData.length][];
-        for (int i = 0; i < nextBrickData.length; i++) {
-            if (nextBrickData[i] != null) {
-                nextPieceRectangles[i] = new Rectangle[nextBrickData[i].length];
-            }
-        }
+            grid.getChildren().clear();
 
-        for (int i = 0; i < nextBrickData.length; i++) {
-            if (nextBrickData[i] != null) {
-                for (int j = 0; j < nextBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
-                    rectangle.setFill(getFillColor(nextBrickData[i][j]));
-                    setRectangleData(nextBrickData[i][j], rectangle);
-                    nextPieceRectangles[i][j] = rectangle;
-                    nextPiece1.add(rectangle, j, i);
+            int[][] nextBrickData = nextShapes.get(pieceIndex);
+            if (nextBrickData == null || nextBrickData.length == 0) continue;
+
+            Rectangle[][] rects = new Rectangle[nextBrickData.length][];
+            for (int i = 0; i < nextBrickData.length; i++) {
+                if (nextBrickData[i] != null) {
+                    rects[i] = new Rectangle[nextBrickData[i].length];
                 }
             }
-        }
-    }
 
-    private void updateNextPiecePanel(ViewData brick) {
-        if (nextPiece1 == null || brick == null) return;
-
-        int[][] nextBrickData = brick.getNextBrickData();
-        if (nextBrickData == null || nextBrickData.length == 0) return;
-
-        if (nextPieceRectangles == null ||
-                nextPieceRectangles.length != nextBrickData.length ||
-                (nextPieceRectangles.length > 0 && nextPieceRectangles[0] != null &&
-                        nextBrickData[0] != null && nextPieceRectangles[0].length != nextBrickData[0].length)) {
-            initNextPiecePanel(brick);
-            return;
-        }
-
-        for (int i = 0; i < nextBrickData.length && i < nextPieceRectangles.length; i++) {
-            if (nextBrickData[i] != null && nextPieceRectangles[i] != null) {
-                for (int j = 0; j < nextBrickData[i].length && j < nextPieceRectangles[i].length; j++) {
-                    if (nextPieceRectangles[i][j] != null) {
-                        setRectangleData(nextBrickData[i][j], nextPieceRectangles[i][j]);
+            for (int i = 0; i < nextBrickData.length; i++) {
+                if (nextBrickData[i] != null) {
+                    for (int j = 0; j < nextBrickData[i].length; j++) {
+                        Rectangle rectangle = new Rectangle(NEXT_PIECE_BRICK_SIZE, NEXT_PIECE_BRICK_SIZE);
+                        rectangle.setFill(getFillColor(nextBrickData[i][j]));
+                        setRectangleData(nextBrickData[i][j], rectangle);
+                        rects[i][j] = rectangle;
+                        grid.add(rectangle, j, i);
                     }
                 }
+            }
+
+            if (pieceIndex == 0) {
+                nextPiece1Rectangles = rects;
+            } else if (pieceIndex == 1) {
+                nextPiece2Rectangles = rects;
+            } else if (pieceIndex == 2) {
+                nextPiece3Rectangles = rects;
             }
         }
     }

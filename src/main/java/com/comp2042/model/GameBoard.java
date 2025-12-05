@@ -15,6 +15,10 @@ import com.comp2042.logic.board.rotation.StandardRotationStrategy;
 
 
 import java.awt.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class GameBoard implements Board {
     private static final int START_X = 4;
@@ -28,7 +32,7 @@ public class GameBoard implements Board {
     private final BrickFactory brickFactory = new BrickFactory();
     private final CollisionService collisionService = new CollisionService();
     private Brick currentBrick;
-    private Brick nextBrick;
+    private final Deque<Brick> nextBricks = new ArrayDeque<>();
 
     public GameBoard(int width, int height) {
         this.width = width;
@@ -78,13 +82,14 @@ public class GameBoard implements Board {
 
     @Override
     public boolean createNewBrick() {
-
-        if (nextBrick == null) {
-            nextBrick = brickFactory.createRandomBrick();
+        if (nextBricks.isEmpty()) {
+            for (int i = 0; i < 3; i++) {
+                nextBricks.add(brickFactory.createRandomBrick());
+            }
         }
 
-        currentBrick = nextBrick;
-        nextBrick = brickFactory.createRandomBrick();
+        currentBrick = nextBricks.poll();
+        nextBricks.add(brickFactory.createRandomBrick());
 
         if (currentBrick instanceof OBrick) {
             brickRotator.setRotationStrategy(new NoRotationStrategy());
@@ -117,8 +122,10 @@ public class GameBoard implements Board {
     
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextBrick.getShapeMatrix().get(0)
-        );
+        List<int[][]> nextShapes = nextBricks.stream()
+                .map(b -> b.getShapeMatrix().get(0))
+                .collect(Collectors.toList());
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextShapes);
     }
 
     @Override
@@ -160,7 +167,7 @@ public class GameBoard implements Board {
     public void setupPuzzleMode() {
         currentGameMatrix = MatrixOperations.generateGarbage(width, height, 10);
         currentBrick = null;
-        nextBrick = null;
+        nextBricks.clear();
         createNewBrick();
     }
 

@@ -1,19 +1,21 @@
 package com.comp2042.view;
 
 import com.comp2042.logic.board.MatrixOperations;
+import java.util.List;
+import java.util.ArrayList;
 
 public final class ViewData {
 
     private final int[][] brickData;
     private final int xPosition;
     private final int yPosition;
-    private final int[][] nextBrickData;
+    private final List<int[][]> nextPieces;
 
-    public ViewData(int[][] brickData, int xPosition, int yPosition, int[][] nextBrickData) {
+    public ViewData(int[][] brickData, int xPosition, int yPosition, List<int[][]> nextPieces) {
         this.brickData = brickData;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
-        this.nextBrickData = nextBrickData;
+        this.nextPieces = new ArrayList<>(nextPieces);
     }
 
     public int[][] getBrickData() {
@@ -28,7 +30,11 @@ public final class ViewData {
         return yPosition;
     }
 
-    public int[][] getNextBrickData() {
-        return MatrixOperations.copy(nextBrickData);
+    public List<int[][]> getNextPieces() {
+        List<int[][]> copies = new ArrayList<>();
+        for (int[][] piece : nextPieces) {
+            copies.add(MatrixOperations.copy(piece));
+        }
+        return copies;
     }
 }

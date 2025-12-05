@@ -81,10 +81,20 @@
         <Label text="NEXT" styleClass="panel-label"/>
         <BorderPane styleClass="panel-border">
             <center>
-                <VBox fx:id="nextPiecesContainer" alignment="CENTER" spacing="15" styleClass="next-pieces-container">
+                <VBox fx:id="nextPiecesContainer" alignment="CENTER" spacing="6" styleClass="next-pieces-container">
                     <BorderPane fx:id="nextPiece1Container" styleClass="next-piece-container">
                         <center>
                             <GridPane fx:id="nextPiece1" vgap="1" hgap="1" styleClass="panel-grid"/>
+                        </center>
+                    </BorderPane>
+                    <BorderPane fx:id="nextPiece2Container" styleClass="next-piece-container">
+                        <center>
+                            <GridPane fx:id="nextPiece2" vgap="1" hgap="1" styleClass="panel-grid"/>
+                        </center>
+                    </BorderPane>
+                    <BorderPane fx:id="nextPiece3Container" styleClass="next-piece-container">
+                        <center>
+                            <GridPane fx:id="nextPiece3" vgap="1" hgap="1" styleClass="panel-grid"/>
                         </center>
                     </BorderPane>
                 </VBox>
@@ -96,10 +106,10 @@
             styleClass="pause-button"
             layoutX="630" layoutY="530"/>
 
-    <VBox alignment="BOTTOM_RIGHT" spacing="3" layoutX="500" layoutY="480">
-        <Label text="HIGH SCORE" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px; -fx-text-fill: #AAAAAA;"/>
-        <Label fx:id="highScoreLabel" text="0" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #FFFF00;"/>
-        <Label fx:id="highScoreNameLabel" text="-" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 12px; -fx-text-fill: #AAAAAA;"/>
+    <VBox alignment="BOTTOM_RIGHT" spacing="3" layoutX="500" layoutY="430">
+        <Label text="HIGH SCORE" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #AAAAAA;"/>
+        <Label fx:id="highScoreLabel" text="0" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 24px; -fx-text-fill: #FFFF00;"/>
+        <Label fx:id="highScoreNameLabel" text="-" style="-fx-font-family: 'Press Start 2P'; -fx-font-size: 16px; -fx-text-fill: #AAAAAA;"/>
     </VBox>
 
     <Group fx:id="pauseMenuOverlay" visible="false" layoutX="0" layoutY="0">
