@@ -37,12 +37,18 @@ public class GameController implements InputEventListener {
     private boolean isTimeAttackActive = false;
     private boolean gameWon = false;
     private boolean gameLost = false;
+    private String playerName = "GUEST";
 
     public GameController(GuiController c, Board board, SoundController soundController, GameMode gameMode) {
+        this(c, board, soundController, gameMode, "GUEST");
+    }
+
+    public GameController(GuiController c, Board board, SoundController soundController, GameMode gameMode, String playerName) {
         this.viewGuiController = c;
         this.board = board;
         this.soundController = soundController;
         this.gameMode = gameMode;
+        this.playerName = playerName != null && !playerName.trim().isEmpty() ? playerName.trim().toUpperCase() : "GUEST";
 
         if (soundController != null) {
             soundController.stopTitleMusic();
@@ -84,6 +90,8 @@ public class GameController implements InputEventListener {
             }
         });
 
+        viewGuiController.initializeHighScoreDisplay();
+        
         if (soundController != null) {
             soundController.playCountdown();
         }
@@ -341,6 +349,14 @@ public class GameController implements InputEventListener {
         if (gameTimer != null && isTimeAttackActive) {
             gameTimer.play();
         }
+    }
+
+    public GameMode getGameMode() {
+        return gameMode;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 
 }

@@ -1,13 +1,15 @@
 package com.comp2042.controller;
 
 import com.comp2042.logic.board.DownData;
-import com.comp2042.logic.score.HighScoreService;
+import com.comp2042.logic.score.HighScoreManager;
 import com.comp2042.model.Board;
+import com.comp2042.model.HighScoreEntry;
 import com.comp2042.model.GameBoard;
 import com.comp2042.model.GameMode;
 import com.comp2042.view.GameModePanel;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
+import com.comp2042.view.LeaderboardPanel;
 import com.comp2042.view.NotificationPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.ViewData;
@@ -73,6 +75,12 @@ public class GuiController implements Initializable {
     private Group gameOverOverlay;
 
     @FXML
+    private Label highScoreLabel;
+
+    @FXML
+    private Label highScoreNameLabel;
+
+    @FXML
     private Label scoreHeaderLabel;
 
     @FXML
@@ -126,6 +134,12 @@ public class GuiController implements Initializable {
     @FXML
     private GameModePanel gameModePanel;
 
+    @FXML
+    private Group leaderboardOverlay;
+
+    @FXML
+    private LeaderboardPanel leaderboardPanel;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -154,7 +168,8 @@ public class GuiController implements Initializable {
 
     private Stage primaryStage;
 
-    private HighScoreService highScoreService;
+    private HighScoreManager highScoreManager;
+    private GameMode currentGameMode;
 
     private SoundController soundController;
 
@@ -208,6 +223,9 @@ public class GuiController implements Initializable {
             if (gameOverPanel.getPlayAgainButton() != null) {
                 gameOverPanel.getPlayAgainButton().setOnAction(this::newGame);
             }
+            if (gameOverPanel.getLeaderboardButton() != null) {
+                gameOverPanel.getLeaderboardButton().setOnAction(e -> showLeaderboard());
+            }
             if (gameOverPanel.getMainMenuButton() != null) {
                 gameOverPanel.getMainMenuButton().setOnAction(this::returnToMainMenu);
             }
@@ -221,10 +239,21 @@ public class GuiController implements Initializable {
             settingsOverlay.setVisible(false);
         }
 
-        highScoreService = new HighScoreService();
+        highScoreManager = new HighScoreManager();
+
+        if (leaderboardOverlay != null) {
+            leaderboardOverlay.setVisible(false);
+        }
+
+        if (leaderboardPanel != null) {
+            leaderboardPanel.setHighScoreManager(highScoreManager);
+            if (leaderboardPanel.getBackButton() != null) {
+                leaderboardPanel.getBackButton().setOnAction(e -> hideLeaderboard());
+            }
+        }
 
         if (settingsPanel != null) {
-            settingsPanel.setHighScoreService(highScoreService);
+            settingsPanel.setHighScoreManager(highScoreManager);
             if (settingsPanel.getDoneButton() != null) {
                 settingsPanel.getDoneButton().setOnAction(e -> hideSettings());
             }
@@ -632,6 +661,9 @@ public class GuiController implements Initializable {
         this.eventListener = eventListener;
         if (eventListener instanceof GameController) {
             this.gameController = (GameController) eventListener;
+            if (gameController != null) {
+                setCurrentGameMode(gameController.getGameMode());
+            }
         }
     }
 
@@ -760,6 +792,7 @@ public class GuiController implements Initializable {
             restoreClassicModeLabels();
         }
 
+        setCurrentGameMode(newMode);
         gameController = new GameController(this, board, soundController, newMode);
         
         refreshGameBackground(board.getBoardMatrix());
@@ -837,14 +870,22 @@ public class GuiController implements Initializable {
             int finalScore = Integer.parseInt(scoreLabel.getText());
             gameOverPanel.setFinalScore(finalScore);
             
-            if (highScoreService != null) {
-                boolean isNewHighScore = highScoreService.updateHighScore(finalScore);
-                gameOverPanel.setHighScore(highScoreService.getHighScore());
-                
-                if (soundController != null) {
-                    if (isNewHighScore) {
-                        soundController.playHighScore();
-                    } else {
+            if (highScoreManager != null && currentGameMode != null) {
+                String playerName = gameController != null ? gameController.getPlayerName() : "GUEST";
+                if (playerName != null && !playerName.equalsIgnoreCase("GUEST")) {
+                    highScoreManager.addScore(currentGameMode, playerName, finalScore);
+                    
+                    if (soundController != null) {
+                        HighScoreEntry topEntry = highScoreManager.getHighestScore(currentGameMode);
+                        int currentHighScore = topEntry != null ? topEntry.getScore() : 0;
+                        if (finalScore > currentHighScore) {
+                            soundController.playHighScore();
+                        } else {
+                            soundController.playGameOver();
+                        }
+                    }
+                } else {
+                    if (soundController != null) {
                         soundController.playGameOver();
                     }
                 }
@@ -853,9 +894,6 @@ public class GuiController implements Initializable {
             }
         } catch (NumberFormatException e) {
             gameOverPanel.setFinalScore(0);
-            if (highScoreService != null) {
-                gameOverPanel.setHighScore(highScoreService.getHighScore());
-            }
             if (soundController != null) {
                 soundController.playGameOver();
             }
@@ -883,15 +921,14 @@ public class GuiController implements Initializable {
             int finalScore = Integer.parseInt(scoreLabel.getText());
             gameOverPanel.setFinalScore(finalScore);
             
-            if (highScoreService != null) {
-                boolean isNewHighScore = highScoreService.updateHighScore(finalScore);
-                gameOverPanel.setHighScore(highScoreService.getHighScore());
+            if (highScoreManager != null && currentGameMode != null) {
+                String playerName = gameController != null ? gameController.getPlayerName() : "GUEST";
+                if (playerName != null && !playerName.equalsIgnoreCase("GUEST")) {
+                    highScoreManager.addScore(currentGameMode, playerName, finalScore);
+                }
             }
         } catch (NumberFormatException e) {
             gameOverPanel.setFinalScore(0);
-            if (highScoreService != null) {
-                gameOverPanel.setHighScore(highScoreService.getHighScore());
-            }
         }
 
         if (gameOverOverlay != null) {
@@ -979,6 +1016,49 @@ public class GuiController implements Initializable {
         if (howToPlayOverlay != null) {
             howToPlayOverlay.setVisible(false);
         }
+    }
+
+    public void showLeaderboard() {
+        if (leaderboardOverlay != null) {
+            leaderboardOverlay.setVisible(true);
+            leaderboardOverlay.toFront();
+            if (leaderboardPanel != null) {
+                leaderboardPanel.refresh();
+                leaderboardPanel.playAnimation();
+            }
+        }
+    }
+
+    public void hideLeaderboard() {
+        if (leaderboardOverlay != null) {
+            leaderboardOverlay.setVisible(false);
+        }
+    }
+
+    public void updateHighScoreDisplay(String name, int score) {
+        if (highScoreLabel != null) {
+            highScoreLabel.setText(String.valueOf(score));
+        }
+        if (highScoreNameLabel != null) {
+            highScoreNameLabel.setText(name != null && !name.isEmpty() ? name : "-");
+        }
+    }
+
+    public void initializeHighScoreDisplay() {
+        if (highScoreManager != null && currentGameMode != null) {
+            HighScoreEntry topEntry = highScoreManager.getHighestScore(currentGameMode);
+            if (topEntry != null) {
+                updateHighScoreDisplay(topEntry.getName(), topEntry.getScore());
+            } else {
+                updateHighScoreDisplay("-", 0);
+            }
+        } else {
+            updateHighScoreDisplay("-", 0);
+        }
+    }
+    
+    public void setCurrentGameMode(GameMode gameMode) {
+        this.currentGameMode = gameMode;
     }
 
     @FXML

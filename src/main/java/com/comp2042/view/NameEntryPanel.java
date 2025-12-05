@@ -7,24 +7,27 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.util.Duration;
 
-public class GameOverPanel extends StackPane {
-    private Label gameOverLabel;
-    private Label finalScoreLabel;
-    private Button playAgainButton;
-    private Button leaderboardButton;
-    private Button mainMenuButton;
-    private VBox menuPanel;
-    private int finalScore = 0;
+import java.util.function.Consumer;
 
-    public GameOverPanel() {
+public class NameEntryPanel extends StackPane {
+    private Label titleLabel;
+    private TextField nameField;
+    private Button playButton;
+    private Button guestButton;
+    private Button cancelButton;
+    private VBox menuPanel;
+    private Consumer<String> onNameEntered;
+    private Runnable onCancel;
+
+    public NameEntryPanel() {
         setAlignment(Pos.CENTER);
         setBackground(Background.EMPTY);
         
@@ -37,41 +40,75 @@ public class GameOverPanel extends StackPane {
         createContent();
     }
 
+    public void setOnNameEntered(Consumer<String> callback) {
+        this.onNameEntered = callback;
+    }
+    
+    public void setOnCancel(Runnable callback) {
+        this.onCancel = callback;
+    }
+    
+    public Button getCancelButton() {
+        return cancelButton;
+    }
+
     private void createContent() {
-        menuPanel = new VBox(20);
+        menuPanel = new VBox(15);
         menuPanel.setAlignment(Pos.CENTER);
-        menuPanel.setPadding(new Insets(30, 40, 30, 40));
-        menuPanel.setPrefWidth(300);
+        menuPanel.setPadding(new Insets(20, 20, 20, 20));
+        menuPanel.setPrefWidth(400);
+        menuPanel.setMaxWidth(400);
+        menuPanel.setPrefHeight(300);
+        menuPanel.setMaxHeight(300);
         menuPanel.setStyle(
             "-fx-border-width: 3px;" +
-            "-fx-border-color: #BF5FFF;" +
+            "-fx-border-color: #00FFFF;" +
             "-fx-border-radius: 10px;" +
             "-fx-background-color: rgba(0, 0, 0, 0.85);" +
             "-fx-background-radius: 10px;"
         );
         
-        gameOverLabel = new Label("GAME OVER");
-        gameOverLabel.setStyle(
-            "-fx-font-family: \"Let's go Digital\";" +
-            "-fx-font-size: 36px;" +
-            "-fx-text-fill: #BF5FFF;" +
+        titleLabel = new Label("ENTER NAME");
+        titleLabel.setStyle(
+            "-fx-font-family: \"Press Start 2P\";" +
+            "-fx-font-size: 16px;" +
+            "-fx-text-fill: #00FFFF;" +
             "-fx-font-weight: bold;"
         );
+        VBox.setMargin(titleLabel, new Insets(0, 0, 10, 0));
         
-        finalScoreLabel = new Label("FINAL SCORE: " + finalScore);
-        finalScoreLabel.setStyle(
-            "-fx-font-family: \"Let's go Digital\";" +
-            "-fx-font-size: 18px;" +
+        nameField = new TextField();
+        nameField.setPromptText("PLAYER");
+        nameField.setMaxWidth(360);
+        nameField.setPrefHeight(35);
+        nameField.setStyle(
+            "-fx-font-family: \"Press Start 2P\";" +
+            "-fx-font-size: 14px;" +
             "-fx-text-fill: white;" +
-            "-fx-font-weight: bold;"
+            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
+            "-fx-border-color: #00FFFF;" +
+            "-fx-border-width: 2px;" +
+            "-fx-border-radius: 4px;"
         );
         
-        VBox buttonsBox = new VBox(15);
-        buttonsBox.setAlignment(Pos.CENTER);
-        buttonsBox.setPadding(new Insets(15, 0, 0, 0));
+        nameField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                handlePlay();
+            } else if (e.getCode() == KeyCode.ESCAPE) {
+                handleCancel();
+            }
+        });
         
-        playAgainButton = new Button("PLAY AGAIN");
-        playAgainButton.setStyle(
+        nameField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.length() > 8) {
+                nameField.setText(oldVal);
+            } else if (newVal != null) {
+                nameField.setText(newVal.toUpperCase());
+            }
+        });
+        
+        playButton = new Button("PLAY");
+        playButton.setStyle(
             "-fx-border-width: 2px;" +
             "-fx-border-color: #00FFFF;" +
             "-fx-border-radius: 6px;" +
@@ -79,14 +116,14 @@ public class GameOverPanel extends StackPane {
             "-fx-background-radius: 6px;" +
             "-fx-text-fill: white;" +
             "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 18px;" +
+            "-fx-font-size: 12px;" +
             "-fx-font-weight: bold;" +
-            "-fx-pref-width: 220px;" +
+            "-fx-pref-width: 200px;" +
             "-fx-pref-height: 40px;" +
             "-fx-cursor: hand;"
         );
-        playAgainButton.setOnMouseEntered(e -> {
-            playAgainButton.setStyle(
+        playButton.setOnMouseEntered(e -> {
+            playButton.setStyle(
                 "-fx-border-width: 2px;" +
                 "-fx-border-color: #00FFFF;" +
                 "-fx-border-radius: 6px;" +
@@ -94,15 +131,15 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
                 "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 12px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
+                "-fx-pref-width: 200px;" +
                 "-fx-pref-height: 40px;" +
                 "-fx-cursor: hand;"
             );
         });
-        playAgainButton.setOnMouseExited(e -> {
-            playAgainButton.setStyle(
+        playButton.setOnMouseExited(e -> {
+            playButton.setStyle(
                 "-fx-border-width: 2px;" +
                 "-fx-border-color: #00FFFF;" +
                 "-fx-border-radius: 6px;" +
@@ -110,31 +147,86 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
                 "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 12px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
+                "-fx-pref-width: 200px;" +
                 "-fx-pref-height: 40px;" +
                 "-fx-cursor: hand;"
             );
         });
+        playButton.setOnAction(e -> handlePlay());
         
-        mainMenuButton = new Button("MAIN MENU");
-        mainMenuButton.setStyle(
+        guestButton = new Button("GUEST");
+        guestButton.setStyle(
             "-fx-border-width: 2px;" +
-            "-fx-border-color: #FF0000;" +
+            "-fx-border-color: #00FFFF;" +
             "-fx-border-radius: 6px;" +
             "-fx-background-color: rgba(0, 0, 0, 0.8);" +
             "-fx-background-radius: 6px;" +
             "-fx-text-fill: white;" +
             "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 18px;" +
+            "-fx-font-size: 12px;" +
             "-fx-font-weight: bold;" +
-            "-fx-pref-width: 220px;" +
+            "-fx-pref-width: 200px;" +
             "-fx-pref-height: 40px;" +
             "-fx-cursor: hand;"
         );
-        mainMenuButton.setOnMouseEntered(e -> {
-            mainMenuButton.setStyle(
+        guestButton.setOnMouseEntered(e -> {
+            guestButton.setStyle(
+                "-fx-border-width: 2px;" +
+                "-fx-border-color: #00FFFF;" +
+                "-fx-border-radius: 6px;" +
+                "-fx-background-color: rgba(0, 255, 255, 0.2);" +
+                "-fx-background-radius: 6px;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-family: \"Press Start 2P\";" +
+                "-fx-font-size: 12px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-pref-width: 200px;" +
+                "-fx-pref-height: 40px;" +
+                "-fx-cursor: hand;"
+            );
+        });
+        guestButton.setOnMouseExited(e -> {
+            guestButton.setStyle(
+                "-fx-border-width: 2px;" +
+                "-fx-border-color: #00FFFF;" +
+                "-fx-border-radius: 6px;" +
+                "-fx-background-color: rgba(0, 0, 0, 0.8);" +
+                "-fx-background-radius: 6px;" +
+                "-fx-text-fill: white;" +
+                "-fx-font-family: \"Press Start 2P\";" +
+                "-fx-font-size: 12px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-pref-width: 200px;" +
+                "-fx-pref-height: 40px;" +
+                "-fx-cursor: hand;"
+            );
+        });
+        guestButton.setOnAction(e -> {
+            if (onNameEntered != null) {
+                onNameEntered.accept("GUEST");
+            }
+            nameField.clear();
+        });
+        
+        cancelButton = new Button("CANCEL");
+        cancelButton.setStyle(
+            "-fx-border-width: 2px;" +
+            "-fx-border-color: #555555;" +
+            "-fx-border-radius: 6px;" +
+            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
+            "-fx-background-radius: 6px;" +
+            "-fx-text-fill: #AAAAAA;" +
+            "-fx-font-family: \"Press Start 2P\";" +
+            "-fx-font-size: 12px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-pref-width: 200px;" +
+            "-fx-pref-height: 40px;" +
+            "-fx-cursor: hand;"
+        );
+        cancelButton.setOnMouseEntered(e -> {
+            cancelButton.setStyle(
                 "-fx-border-width: 2px;" +
                 "-fx-border-color: #FF0000;" +
                 "-fx-border-radius: 6px;" +
@@ -142,82 +234,63 @@ public class GameOverPanel extends StackPane {
                 "-fx-background-radius: 6px;" +
                 "-fx-text-fill: white;" +
                 "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 12px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
+                "-fx-pref-width: 200px;" +
                 "-fx-pref-height: 40px;" +
                 "-fx-cursor: hand;"
             );
         });
-        mainMenuButton.setOnMouseExited(e -> {
-            mainMenuButton.setStyle(
+        cancelButton.setOnMouseExited(e -> {
+            cancelButton.setStyle(
                 "-fx-border-width: 2px;" +
-                "-fx-border-color: #FF0000;" +
+                "-fx-border-color: #555555;" +
                 "-fx-border-radius: 6px;" +
                 "-fx-background-color: rgba(0, 0, 0, 0.8);" +
                 "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
+                "-fx-text-fill: #AAAAAA;" +
                 "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 18px;" +
+                "-fx-font-size: 12px;" +
                 "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
+                "-fx-pref-width: 200px;" +
                 "-fx-pref-height: 40px;" +
                 "-fx-cursor: hand;"
             );
         });
+        cancelButton.setOnAction(e -> handleCancel());
         
-        leaderboardButton = new Button("LEADERBOARD");
-        leaderboardButton.setStyle(
-            "-fx-border-width: 2px;" +
-            "-fx-border-color: #BF5FFF;" +
-            "-fx-border-radius: 6px;" +
-            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-            "-fx-background-radius: 6px;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 14px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-pref-width: 220px;" +
-            "-fx-pref-height: 40px;" +
-            "-fx-cursor: hand;"
-        );
-        leaderboardButton.setOnMouseEntered(e -> {
-            leaderboardButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #BF5FFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(191, 95, 255, 0.2);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        leaderboardButton.setOnMouseExited(e -> {
-            leaderboardButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #BF5FFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 220px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
+        VBox buttonsBox = new VBox(10);
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.getChildren().addAll(playButton, guestButton, cancelButton);
         
-        buttonsBox.getChildren().addAll(playAgainButton, leaderboardButton, mainMenuButton);
-        menuPanel.getChildren().addAll(gameOverLabel, finalScoreLabel, buttonsBox);
-        
+        menuPanel.getChildren().addAll(titleLabel, nameField, buttonsBox);
         getChildren().add(menuPanel);
+    }
+
+    private void handlePlay() {
+        String name = nameField.getText();
+        if (name == null || name.trim().isEmpty()) {
+            name = "PLAYER";
+        } else {
+            name = name.trim().toUpperCase();
+            if (name.length() > 8) {
+                name = name.substring(0, 8);
+            }
+        }
+        
+        if (onNameEntered != null) {
+            onNameEntered.accept(name);
+        }
+        
+        nameField.clear();
+    }
+
+    private void handleCancel() {
+        nameField.clear();
+        setVisible(false);
+        if (onCancel != null) {
+            onCancel.run();
+        }
     }
 
     public void playAnimation() {
@@ -238,30 +311,16 @@ public class GameOverPanel extends StackPane {
         
         ParallelTransition animation = new ParallelTransition(fadeIn, scaleUp);
         animation.play();
+        
+        javafx.application.Platform.runLater(() -> {
+            nameField.requestFocus();
+            nameField.selectAll();
+        });
     }
 
-    public void setFinalScore(int score) {
-        this.finalScore = score;
-        if (finalScoreLabel != null) {
-            finalScoreLabel.setText("FINAL SCORE: " + score);
-        }
-    }
-
-    public Button getPlayAgainButton() {
-        return playAgainButton;
-    }
-
-    public Button getLeaderboardButton() {
-        return leaderboardButton;
-    }
-
-    public Button getMainMenuButton() {
-        return mainMenuButton;
-    }
-
-    public void setMessage(String message) {
-        if (gameOverLabel != null) {
-            gameOverLabel.setText(message);
-        }
+    public void reset() {
+        nameField.clear();
+        nameField.setText("PLAYER");
     }
 }
+

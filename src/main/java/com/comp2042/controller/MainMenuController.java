@@ -7,7 +7,8 @@ import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.TetrisLogo;
 import com.comp2042.view.GameModePanel;
-import com.comp2042.logic.score.HighScoreService;
+import com.comp2042.view.NameEntryPanel;
+import com.comp2042.logic.score.HighScoreManager;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -65,16 +66,23 @@ public class MainMenuController implements Initializable {
     @FXML
     private GameModePanel gameModePanel;
 
+    @FXML
+    private Group nameEntryOverlay;
+
+    @FXML
+    private NameEntryPanel nameEntryPanel;
+
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
     private SoundController soundController;
-    private HighScoreService highScoreService;
+    private HighScoreManager highScoreManager;
+    private GameMode selectedMode;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         soundController = new SoundController();
         soundController.playTitleMusic();
-        highScoreService = new HighScoreService();
+        highScoreManager = new HighScoreManager();
         
         if (animationContainer != null) {
             animationController = new MainMenuAnimationController(animationContainer);
@@ -91,7 +99,7 @@ public class MainMenuController implements Initializable {
         }
         if (settingsPanel != null) {
             settingsPanel.setSoundController(soundController);
-            settingsPanel.setHighScoreService(highScoreService);
+            settingsPanel.setHighScoreManager(highScoreManager);
             if (settingsPanel.getDoneButton() != null) {
                 settingsPanel.getDoneButton().setOnAction(e -> hideSettingsFromMenu());
             }
@@ -100,10 +108,19 @@ public class MainMenuController implements Initializable {
             gameModeOverlay.setVisible(false);
         }
         if (gameModePanel != null) {
-            gameModePanel.setClassicAction(() -> startGameWithMode(GameMode.CLASSIC));
-            gameModePanel.setTimeAttackAction(() -> startGameWithMode(GameMode.TIME_ATTACK));
-            gameModePanel.setPuzzleAction(() -> startGameWithMode(GameMode.PUZZLE));
-            gameModePanel.setRevertedAction(() -> startGameWithMode(GameMode.REVERTED));
+            gameModePanel.setClassicAction(() -> showNameEntry(GameMode.CLASSIC));
+            gameModePanel.setTimeAttackAction(() -> showNameEntry(GameMode.TIME_ATTACK));
+            gameModePanel.setPuzzleAction(() -> showNameEntry(GameMode.PUZZLE));
+            gameModePanel.setRevertedAction(() -> showNameEntry(GameMode.REVERTED));
+        }
+        if (nameEntryOverlay != null) {
+            nameEntryOverlay.setVisible(false);
+        }
+        if (nameEntryPanel != null) {
+            nameEntryPanel.setOnNameEntered(name -> {
+                launchGame(selectedMode, name);
+            });
+            nameEntryPanel.setOnCancel(this::hideNameEntry);
         }
     }
 
@@ -122,9 +139,28 @@ public class MainMenuController implements Initializable {
         }
     }
 
-    private void startGameWithMode(GameMode gameMode) {
+    private void showNameEntry(GameMode gameMode) {
+        selectedMode = gameMode;
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(false);
+        }
+        if (nameEntryOverlay != null) {
+            nameEntryOverlay.setVisible(true);
+            nameEntryOverlay.toFront();
+            if (nameEntryPanel != null) {
+                nameEntryPanel.reset();
+                nameEntryPanel.playAnimation();
+            }
+        }
+    }
+
+    private void launchGame(GameMode gameMode, String playerName) {
         if (animationController != null) {
             animationController.stop();
+        }
+        
+        if (nameEntryOverlay != null) {
+            nameEntryOverlay.setVisible(false);
         }
         
         try {
@@ -140,10 +176,14 @@ public class MainMenuController implements Initializable {
             guiController.setPrimaryStage(primaryStage);
 
             Board board = new GameBoard(25, 10);
-            new GameController(guiController, board, soundController, gameMode);
+            new GameController(guiController, board, soundController, gameMode, playerName);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void startGameWithMode(GameMode gameMode) {
+        launchGame(gameMode, "GUEST");
     }
 
     private void startGameInternal() {
@@ -189,6 +229,16 @@ public class MainMenuController implements Initializable {
     private void hideSettingsFromMenu() {
         if (settingsOverlay != null) {
             settingsOverlay.setVisible(false);
+        }
+    }
+    
+    private void hideNameEntry() {
+        if (nameEntryOverlay != null) {
+            nameEntryOverlay.setVisible(false);
+        }
+        if (gameModeOverlay != null) {
+            gameModeOverlay.setVisible(true);
+            gameModeOverlay.toFront();
         }
     }
 }

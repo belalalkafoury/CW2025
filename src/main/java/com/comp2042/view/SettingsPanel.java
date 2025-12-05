@@ -1,7 +1,7 @@
 package com.comp2042.view;
 
 import com.comp2042.controller.SoundController;
-import com.comp2042.logic.score.HighScoreService;
+import com.comp2042.logic.score.HighScoreManager;
 import com.comp2042.model.GameSettings;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
@@ -35,7 +35,7 @@ public class SettingsPanel extends StackPane {
     private Button doneButton;
     private VBox menuPanel;
     private SoundController soundController;
-    private HighScoreService highScoreService;
+    private HighScoreManager highScoreManager;
 
     public SettingsPanel() {
         setAlignment(Pos.CENTER);
@@ -57,8 +57,8 @@ public class SettingsPanel extends StackPane {
         updateVolumeDisplays();
     }
 
-    public void setHighScoreService(HighScoreService highScoreService) {
-        this.highScoreService = highScoreService;
+    public void setHighScoreManager(HighScoreManager highScoreManager) {
+        this.highScoreManager = highScoreManager;
     }
 
     private void createContent() {
@@ -284,8 +284,8 @@ public class SettingsPanel extends StackPane {
     }
 
     private void resetHighScores() {
-        if (highScoreService != null) {
-            highScoreService.resetHighScore();
+        if (highScoreManager != null) {
+            highScoreManager.resetAllHighScores();
         }
     }
 
