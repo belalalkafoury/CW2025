@@ -15,5 +15,7 @@ public interface InputEventListener {
 
     DownData onHardDropEvent(MoveEvent event);
 
+    ViewData onHoldEvent();
+
     void createNewGame();
 }

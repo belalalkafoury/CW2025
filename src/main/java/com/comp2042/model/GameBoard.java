@@ -33,6 +33,8 @@ public class GameBoard implements Board {
     private final CollisionService collisionService = new CollisionService();
     private Brick currentBrick;
     private final Deque<Brick> nextBricks = new ArrayDeque<>();
+    private Brick heldBrick;
+    private boolean canHold = true;
 
     public GameBoard(int width, int height) {
         this.width = width;
@@ -82,6 +84,7 @@ public class GameBoard implements Board {
 
     @Override
     public boolean createNewBrick() {
+        canHold = true;
         if (nextBricks.isEmpty()) {
             for (int i = 0; i < 3; i++) {
                 nextBricks.add(brickFactory.createRandomBrick());
@@ -108,6 +111,38 @@ public class GameBoard implements Board {
         );
     }
 
+    @Override
+    public void holdBrick() {
+        if (!canHold) {
+            return;
+        }
+
+        if (heldBrick == null) {
+            heldBrick = currentBrick;
+            if (nextBricks.isEmpty()) {
+                for (int i = 0; i < 3; i++) {
+                    nextBricks.add(brickFactory.createRandomBrick());
+                }
+            }
+            currentBrick = nextBricks.poll();
+            nextBricks.add(brickFactory.createRandomBrick());
+        } else {
+            Brick temp = currentBrick;
+            currentBrick = heldBrick;
+            heldBrick = temp;
+        }
+
+        if (currentBrick instanceof OBrick) {
+            brickRotator.setRotationStrategy(new NoRotationStrategy());
+        } else {
+            brickRotator.setRotationStrategy(new StandardRotationStrategy());
+        }
+
+        brickRotator.setBrick(currentBrick);
+        currentOffset = new Point(START_X, START_Y);
+        canHold = false;
+    }
+
 
 
     @Override
@@ -125,7 +160,8 @@ public class GameBoard implements Board {
         List<int[][]> nextShapes = nextBricks.stream()
                 .map(b -> b.getShapeMatrix().get(0))
                 .collect(Collectors.toList());
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextShapes);
+        int[][] heldShape = (heldBrick != null) ? heldBrick.getShapeMatrix().get(0) : null;
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextShapes, heldShape);
     }
 
     @Override
@@ -161,6 +197,8 @@ public class GameBoard implements Board {
     public void newGame() {
         currentGameMatrix = new int[width][height];
         score.reset();
+        heldBrick = null;
+        canHold = true;
         createNewBrick();
     }
 
@@ -168,6 +206,8 @@ public class GameBoard implements Board {
         currentGameMatrix = MatrixOperations.generateGarbage(width, height, 10);
         currentBrick = null;
         nextBricks.clear();
+        heldBrick = null;
+        canHold = true;
         createNewBrick();
     }
 

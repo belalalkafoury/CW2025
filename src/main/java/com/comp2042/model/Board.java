@@ -38,4 +38,6 @@ public interface Board {
     java.util.List<Integer> getRowsToClear();
     
     void setupPuzzleMode();
+    
+    void holdBrick();
 }

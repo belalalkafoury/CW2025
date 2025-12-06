@@ -10,12 +10,14 @@ public final class ViewData {
     private final int xPosition;
     private final int yPosition;
     private final List<int[][]> nextPieces;
+    private final int[][] heldBrickData;
 
-    public ViewData(int[][] brickData, int xPosition, int yPosition, List<int[][]> nextPieces) {
+    public ViewData(int[][] brickData, int xPosition, int yPosition, List<int[][]> nextPieces, int[][] heldBrickData) {
         this.brickData = brickData;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.nextPieces = new ArrayList<>(nextPieces);
+        this.heldBrickData = heldBrickData != null ? MatrixOperations.copy(heldBrickData) : null;
     }
 
     public int[][] getBrickData() {
@@ -36,5 +38,9 @@ public final class ViewData {
             copies.add(MatrixOperations.copy(piece));
         }
         return copies;
+    }
+
+    public int[][] getHeldBrickData() {
+        return heldBrickData != null ? MatrixOperations.copy(heldBrickData) : null;
     }
 }

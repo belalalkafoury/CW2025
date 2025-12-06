@@ -169,6 +169,19 @@ public class GameController implements InputEventListener {
     }
 
     @Override
+    public ViewData onHoldEvent() {
+        if (isClearing || isCountdown) {
+            return board.getViewData();
+        }
+        board.holdBrick();
+        if (soundController != null) {
+            soundController.playMove();
+        }
+        viewGuiController.refreshBrick(board.getViewData());
+        return board.getViewData();
+    }
+
+    @Override
     public DownData onHardDropEvent(MoveEvent event) {
         if (isClearing || isCountdown) {
             return new DownData(null, board.getViewData());

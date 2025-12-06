@@ -316,6 +316,7 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutY(gameBoardY - 42 + (brick.getyPosition() - 2) * cellSize);
 
         updateNextPieces(brick.getNextPieces());
+        updateHeldPiece(brick.getHeldBrickData());
         initGhostPiece(brick);
     }
 
@@ -437,6 +438,7 @@ public class GuiController implements Initializable {
                 }
             }
             updateNextPieces(brick.getNextPieces());
+            updateHeldPiece(brick.getHeldBrickData());
         }
     }
 
@@ -810,6 +812,27 @@ public class GuiController implements Initializable {
 
     public void setAnimationController(AnimationController animationController) {
         this.animationController = animationController;
+    }
+
+    private void updateHeldPiece(int[][] heldBrickData) {
+        if (holdPanel == null) return;
+
+        holdPanel.getChildren().clear();
+
+        if (heldBrickData == null || heldBrickData.length == 0) {
+            return;
+        }
+
+        for (int i = 0; i < heldBrickData.length; i++) {
+            if (heldBrickData[i] != null) {
+                for (int j = 0; j < heldBrickData[i].length; j++) {
+                    Rectangle rectangle = new Rectangle(NEXT_PIECE_BRICK_SIZE, NEXT_PIECE_BRICK_SIZE);
+                    rectangle.setFill(getFillColor(heldBrickData[i][j]));
+                    setRectangleData(heldBrickData[i][j], rectangle);
+                    holdPanel.add(rectangle, j, i);
+                }
+            }
+        }
     }
 
     private void updateNextPieces(List<int[][]> nextShapes) {
