@@ -23,6 +23,15 @@ import java.util.stream.Collectors;
 public class GameBoard implements Board {
     private static final int START_X = 4;
     private static final int START_Y = 0;
+    
+    private static final Point[] WALL_KICKS = {
+        new Point(0, 0),
+        new Point(1, 0),
+        new Point(-1, 0),
+        new Point(0, -1),
+        new Point(2, 0),
+        new Point(-2, 0)
+    };
     private final int width;
     private final int height;
     private final BrickRotator brickRotator;
@@ -75,11 +84,21 @@ public class GameBoard implements Board {
     @Override
     public boolean rotateLeftBrick() {
         NextShapeInfo nextShape = brickRotator.getNextShape();
-        if (!canPlaceAt(nextShape.getShape(), currentOffset)) {
-            return false;
+        
+        for (Point offset : WALL_KICKS) {
+            Point testPos = new Point(
+                (int)(currentOffset.getX() + offset.getX()),
+                (int)(currentOffset.getY() + offset.getY())
+            );
+            
+            if (canPlaceAt(nextShape.getShape(), testPos)) {
+                currentOffset = testPos;
+                brickRotator.setCurrentShape(nextShape.getPosition());
+                return true;
+            }
         }
-        brickRotator.setCurrentShape(nextShape.getPosition());
-        return true;
+        
+        return false;
     }
 
     @Override
