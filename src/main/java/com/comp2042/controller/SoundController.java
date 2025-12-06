@@ -93,6 +93,16 @@ public class SoundController {
         }
     }
 
+    public void playComboSound(int combo) {
+        if (!isMuted && lineClearSound != null) {
+            double rate = 1.0 + (combo * 0.1);
+            rate = Math.min(rate, 2.0);
+            lineClearSound.setRate(rate);
+            lineClearSound.setVolume(soundVolume);
+            lineClearSound.play();
+        }
+    }
+
     public void playGameOver() {
         if (!isMuted && gameOverSound != null) {
             gameOverSound.setVolume(soundVolume);

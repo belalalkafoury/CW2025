@@ -241,12 +241,22 @@ public class GameController implements InputEventListener {
         
         if (result.getLinesRemoved() > 0) {
             isClearing = true;
-        if (soundController != null) {
-            soundController.playLineClear();
-        }
+            board.getScore().incrementCombo();
+            int comboValue = board.getScore().getCombo();
+            
+            if (soundController != null) {
+                soundController.playComboSound(comboValue);
+            }
+            
+            if (comboValue >= 2) {
+                viewGuiController.showComboAnimation(comboValue);
+            }
+            
             viewGuiController.animateClear(result.getClearedIndices(), () -> {
                 board.commitClear(result);
+                int scoreBonus = result.getScoreBonus();
                 scoreService.applyLineClearBonus(result);
+                viewGuiController.showScoreAnimation("+" + scoreBonus);
                 
                 viewGuiController.refreshGameBackground(board.getBoardMatrix());
                 
@@ -261,6 +271,7 @@ public class GameController implements InputEventListener {
                 }
             });
         } else {
+            board.getScore().resetCombo();
             scoreService.applyLineClearBonus(result);
             if (!board.createNewBrick()) {
                 stopGameTimer();

@@ -41,6 +41,10 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
+import javafx.animation.ScaleTransition;
+import javafx.animation.TranslateTransition;
+import javafx.scene.text.Text;
+import javafx.scene.effect.DropShadow;
 import javafx.util.Duration;
 import java.util.List;
 
@@ -647,6 +651,84 @@ public class GuiController implements Initializable {
         }
     }
 
+    private void showFloatingText(String text, double x, double y, Color color) {
+        if (groupNotification == null) {
+            return;
+        }
+
+        Text textNode = new Text(text);
+        try {
+            Font font = Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 20);
+            textNode.setFont(font);
+        } catch (Exception e) {
+            textNode.setFont(Font.font("Arial", 20));
+        }
+        textNode.setFill(color);
+        textNode.setStroke(Color.WHITE);
+        textNode.setStrokeWidth(1);
+        
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setColor(color);
+        dropShadow.setRadius(10);
+        dropShadow.setSpread(0.5);
+        textNode.setEffect(dropShadow);
+
+        groupNotification.getChildren().add(textNode);
+        
+        javafx.application.Platform.runLater(() -> {
+            double textWidth = textNode.getBoundsInLocal().getWidth();
+            textNode.setLayoutX(x - (textWidth / 2));
+        });
+        
+        textNode.setLayoutX(x);
+        textNode.setLayoutY(y);
+
+        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300), textNode);
+        scaleTransition.setFromX(0.5);
+        scaleTransition.setFromY(0.5);
+        scaleTransition.setToX(1.0);
+        scaleTransition.setToY(1.0);
+
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), textNode);
+        fadeTransition.setFromValue(1.0);
+        fadeTransition.setToValue(0.0);
+
+        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(1000), textNode);
+        translateTransition.setByY(-50);
+
+        ParallelTransition parallelTransition = new ParallelTransition(scaleTransition, fadeTransition, translateTransition);
+        parallelTransition.setOnFinished(e -> groupNotification.getChildren().remove(textNode));
+        parallelTransition.play();
+    }
+
+    public void showComboAnimation(int combo) {
+        if (combo < 2 || gameBoard == null || groupNotification == null) {
+            return;
+        }
+
+        double boardCenterX = gameBoard.getLayoutX() + (gameBoard.getWidth() / 2);
+        double boardCenterY = gameBoard.getLayoutY() + (gameBoard.getHeight() / 2);
+        
+        double relativeX = boardCenterX - groupNotification.getLayoutX();
+        double relativeY = boardCenterY - groupNotification.getLayoutY();
+        
+        showFloatingText("COMBO x" + combo, relativeX, relativeY, Color.CYAN);
+    }
+
+    public void showScoreAnimation(String scoreText) {
+        if (gameBoard == null || groupNotification == null) {
+            return;
+        }
+
+        double boardCenterX = gameBoard.getLayoutX() + (gameBoard.getWidth() / 2);
+        double boardCenterY = gameBoard.getLayoutY() + (gameBoard.getHeight() / 2);
+        
+        double relativeX = boardCenterX - groupNotification.getLayoutX();
+        double relativeY = boardCenterY - groupNotification.getLayoutY();
+        
+        showFloatingText(scoreText, relativeX, relativeY, Color.YELLOW);
+    }
+
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(getFillColor(color));
         rectangle.setArcHeight(9);
@@ -656,13 +738,6 @@ public class GuiController implements Initializable {
     private void moveDown(MoveEvent event) {
         if (isPause.getValue() == Boolean.FALSE) {
             DownData downData = eventListener.onDownEvent(event);
-            if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
-                NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
-                groupNotification.getChildren().add(notificationPanel);
-                notificationPanel.setLayoutX(-110);
-                notificationPanel.setLayoutY(-100);
-                notificationPanel.showScore(groupNotification.getChildren());
-            }
             refreshBrick(downData.getViewData());
         }
         gamePanel.requestFocus();
