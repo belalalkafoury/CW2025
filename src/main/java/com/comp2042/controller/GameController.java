@@ -54,7 +54,7 @@ public class GameController implements InputEventListener {
             soundController.stopTitleMusic();
         }
 
-        board.createNewBrick();
+        board.newGame();
         viewGuiController.setEventListener(this);
         this.inputHandler = new InputHandler(this, this.gameMode);
         viewGuiController.setInputHandler(this.inputHandler);

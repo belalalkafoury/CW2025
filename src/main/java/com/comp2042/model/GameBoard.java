@@ -215,9 +215,15 @@ public class GameBoard implements Board {
     @Override
     public void newGame() {
         currentGameMatrix = new int[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                currentGameMatrix[i][j] = 0;
+            }
+        }
         score.reset();
         heldBrick = null;
         canHold = true;
+        nextBricks.clear();
         createNewBrick();
     }
 
@@ -300,4 +306,19 @@ public class GameBoard implements Board {
         return ghostY;
     }
 
+    Brick getCurrentBrickForTest() {
+        return currentBrick;
+    }
+
+    Brick getHeldBrickForTest() {
+        return heldBrick;
+    }
+
+    boolean canHoldForTest() {
+        return canHold;
+    }
+
+    Point getCurrentOffsetForTest() {
+        return new Point(currentOffset);
+    }
 }

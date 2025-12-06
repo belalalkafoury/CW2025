@@ -54,17 +54,17 @@
         </BorderPane>
     </VBox>
 
-    <BorderPane styleClass="game-board" fx:id="gameBoard" 
-                layoutX="250" layoutY="50"
-                prefWidth="225" prefHeight="498">
-        <center>
-            <GridPane fx:id="gamePanel"
-                      styleClass="game-panel"
-                      hgap="1"
-                      vgap="1"
-                      alignment="CENTER"/>
-        </center>
-    </BorderPane>
+    <Pane fx:id="gameAreaPane" styleClass="game-board" layoutX="250" layoutY="50" prefWidth="225" prefHeight="498">
+        <GridPane fx:id="gamePanel"
+                  styleClass="game-panel"
+                  hgap="1"
+                  vgap="1"
+                  alignment="CENTER"
+                  layoutX="8"
+                  layoutY="8"/>
+        <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true"/>
+        <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
+    </Pane>
 
     <Group fx:id="groupNotification" layoutX="263.5" layoutY="303">
     </Group>
@@ -73,9 +73,6 @@
         <Rectangle width="700" height="600" styleClass="pause-dim-background"/>
         <GameOverPanel fx:id="gameOverPanel" layoutX="200" layoutY="175"/>
     </Group>
-
-    <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
-    <GridPane fx:id="ghostPanel" vgap="1" hgap="1" mouseTransparent="true"/>
 
     <VBox alignment="TOP_CENTER" spacing="10" layoutX="520" layoutY="30" styleClass="right-panel">
         <Label text="NEXT" styleClass="panel-label"/>
