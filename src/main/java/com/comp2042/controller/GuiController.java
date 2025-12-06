@@ -291,10 +291,72 @@ public class GuiController implements Initializable {
         }
     }
 
+    public void resetView() {
+        if (brickPanel != null) {
+            brickPanel.getChildren().clear();
+            brickPanel.setLayoutX(0);
+            brickPanel.setLayoutY(0);
+        }
+
+        if (ghostPanel != null) {
+            ghostPanel.getChildren().clear();
+            ghostPanel.setLayoutX(0);
+            ghostPanel.setLayoutY(0);
+        }
+
+        if (holdPanel != null) {
+            holdPanel.getChildren().clear();
+        }
+
+        if (nextPiece1 != null) {
+            nextPiece1.getChildren().clear();
+        }
+        if (nextPiece2 != null) {
+            nextPiece2.getChildren().clear();
+        }
+        if (nextPiece3 != null) {
+            nextPiece3.getChildren().clear();
+        }
+
+        if (displayMatrix != null) {
+            for (int i = 0; i < displayMatrix.length; i++) {
+                if (displayMatrix[i] != null) {
+                    for (int j = 0; j < displayMatrix[i].length; j++) {
+                        if (displayMatrix[i][j] != null) {
+                            displayMatrix[i][j].setFill(Color.TRANSPARENT);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (scoreLabel != null) {
+            scoreLabel.setText("0");
+        }
+        if (levelLabel != null) {
+            levelLabel.setText("1");
+        }
+        if (linesLabel != null) {
+            linesLabel.setText("0");
+        }
+    }
+
     public void initGameView(int[][] boardMatrix, ViewData brick) {
+        resetView();
+
         if (!gridCreated) {
             createGameBoardGrid(boardMatrix);
             gridCreated = true;
+        }
+
+        if (displayMatrix != null) {
+            for (int i = 0; i < displayMatrix.length; i++) {
+                for (int j = 0; j < displayMatrix[i].length; j++) {
+                    if (displayMatrix[i][j] != null) {
+                        displayMatrix[i][j].setFill(Color.TRANSPARENT);
+                    }
+                }
+            }
         }
 
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
@@ -542,9 +604,21 @@ public class GuiController implements Initializable {
     }
 
     public void refreshGameBackground(int[][] board) {
+        if (displayMatrix == null) {
+            return;
+        }
+        for (int i = 0; i < displayMatrix.length; i++) {
+            for (int j = 0; j < displayMatrix[i].length; j++) {
+                if (displayMatrix[i][j] != null) {
+                    displayMatrix[i][j].setFill(Color.TRANSPARENT);
+                }
+            }
+        }
         for (int i = 2; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                setRectangleData(board[i][j], displayMatrix[i][j]);
+                if (i < displayMatrix.length && j < displayMatrix[i].length && displayMatrix[i][j] != null) {
+                    setRectangleData(board[i][j], displayMatrix[i][j]);
+                }
             }
         }
     }

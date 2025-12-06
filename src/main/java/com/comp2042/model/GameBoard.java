@@ -215,9 +215,15 @@ public class GameBoard implements Board {
     @Override
     public void newGame() {
         currentGameMatrix = new int[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                currentGameMatrix[i][j] = 0;
+            }
+        }
         score.reset();
         heldBrick = null;
         canHold = true;
+        nextBricks.clear();
         createNewBrick();
     }
 
