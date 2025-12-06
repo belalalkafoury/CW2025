@@ -23,6 +23,7 @@ import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -60,7 +61,7 @@ public class GuiController implements Initializable {
     private GridPane gamePanel;
 
     @FXML
-    private BorderPane gameBoard;
+    private Pane gameAreaPane;
 
     @FXML
     private Group groupNotification;
@@ -197,6 +198,11 @@ public class GuiController implements Initializable {
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
 
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(gameAreaPane.widthProperty());
+        clip.heightProperty().bind(gameAreaPane.heightProperty());
+        gameAreaPane.setClip(clip);
+
         gamePanel.setOnKeyPressed(keyEvent -> {
             KeyCode code = keyEvent.getCode();
 
@@ -313,11 +319,15 @@ public class GuiController implements Initializable {
             }
         }
 
-        double gameBoardX = gameBoard.getLayoutX() + 8;
-        double gameBoardY = gameBoard.getLayoutY() + 8;
         double cellSize = BRICK_SIZE + 1;
-        brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * cellSize);
-        brickPanel.setLayoutY(gameBoardY - 42 + (brick.getyPosition() - 2) * cellSize);
+        double borderOffset = 8;
+        brickPanel.setLayoutX(0);
+        brickPanel.setLayoutY(0);
+        
+        double startX = borderOffset + brick.getxPosition() * cellSize;
+        double startY = borderOffset + (brick.getyPosition() - 2) * cellSize;
+        brickPanel.setLayoutX(startX);
+        brickPanel.setLayoutY(startY);
 
         updateNextPieces(brick.getNextPieces());
         updateHeldPiece(brick.getHeldBrickData());
@@ -408,9 +418,8 @@ public class GuiController implements Initializable {
 
     public void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            double gameBoardX = gameBoard.getLayoutX() + 8;
-            double gameBoardY = gameBoard.getLayoutY() + 8;
             double cellSize = BRICK_SIZE + 1;
+            double borderOffset = 8;
             
             updateGhostPiece(brick);
             
@@ -426,15 +435,12 @@ public class GuiController implements Initializable {
             }
             
             int currentY = brick.getyPosition();
-            int ghostY = board.getGhostY(brick.getxPosition(), currentY);
-            boolean isAtLandingPosition = (ghostY == currentY);
+            int currentX = brick.getxPosition();
             
-            brickPanel.setLayoutX(gameBoardX + brick.getxPosition() * cellSize);
-            if (isAtLandingPosition) {
-                brickPanel.setLayoutY(gameBoardY - 42 + currentY * cellSize);
-            } else {
-                brickPanel.setLayoutY(gameBoardY - 42 + (currentY - 2) * cellSize);
-            }
+            double startX = borderOffset + currentX * cellSize;
+            double startY = borderOffset + (currentY - 2) * cellSize;
+            brickPanel.setLayoutX(startX);
+            brickPanel.setLayoutY(startY);
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
@@ -502,12 +508,16 @@ public class GuiController implements Initializable {
             }
         }
 
-        double gameBoardX = gameBoard.getLayoutX() + 8;
-        double gameBoardY = gameBoard.getLayoutY() + 8;
         double cellSize = BRICK_SIZE + 1;
-
-        ghostPanel.setLayoutX(gameBoardX + currentX * cellSize);
-        ghostPanel.setLayoutY(gameBoardY - 42 + ghostY * cellSize);
+        double borderOffset = 8;
+        
+        ghostPanel.setLayoutX(0);
+        ghostPanel.setLayoutY(0);
+        
+        double ghostStartX = borderOffset + currentX * cellSize;
+        double ghostStartY = borderOffset + (ghostY - 2) * cellSize;
+        ghostPanel.setLayoutX(ghostStartX);
+        ghostPanel.setLayoutY(ghostStartY);
 
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
@@ -702,12 +712,12 @@ public class GuiController implements Initializable {
     }
 
     public void showComboAnimation(int combo) {
-        if (combo < 2 || gameBoard == null || groupNotification == null) {
+        if (combo < 2 || gameAreaPane == null || groupNotification == null) {
             return;
         }
 
-        double boardCenterX = gameBoard.getLayoutX() + (gameBoard.getWidth() / 2);
-        double boardCenterY = gameBoard.getLayoutY() + (gameBoard.getHeight() / 2);
+        double boardCenterX = gameAreaPane.getLayoutX() + (gameAreaPane.getWidth() / 2);
+        double boardCenterY = gameAreaPane.getLayoutY() + (gameAreaPane.getHeight() / 2);
         
         double relativeX = boardCenterX - groupNotification.getLayoutX();
         double relativeY = boardCenterY - groupNotification.getLayoutY();
@@ -716,12 +726,12 @@ public class GuiController implements Initializable {
     }
 
     public void showScoreAnimation(String scoreText) {
-        if (gameBoard == null || groupNotification == null) {
+        if (gameAreaPane == null || groupNotification == null) {
             return;
         }
 
-        double boardCenterX = gameBoard.getLayoutX() + (gameBoard.getWidth() / 2);
-        double boardCenterY = gameBoard.getLayoutY() + (gameBoard.getHeight() / 2);
+        double boardCenterX = gameAreaPane.getLayoutX() + (gameAreaPane.getWidth() / 2);
+        double boardCenterY = gameAreaPane.getLayoutY() + (gameAreaPane.getHeight() / 2);
         
         double relativeX = boardCenterX - groupNotification.getLayoutX();
         double relativeY = boardCenterY - groupNotification.getLayoutY();
