@@ -12,6 +12,7 @@ import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.LeaderboardPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.ViewData;
+import com.comp2042.view.Particle;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -65,6 +66,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private Pane gameAreaPane;
+    
+    @FXML
+    private Pane rootPane;
 
     @FXML
     private Group groupNotification;
@@ -662,6 +666,20 @@ public class GuiController implements Initializable {
                     Rectangle rect = displayMatrix[rowIndex][col];
                     if (rect != null && rect.isVisible() && rect.getOpacity() > 0.1) {
                         Color originalColor = (Color) rect.getFill();
+                        
+                        double cellSize = BRICK_SIZE + CELL_GAP;
+                        double blockX = (gameAreaPane != null ? gameAreaPane.getLayoutX() : 250) + BORDER_OFFSET + col * cellSize + cellSize / 2;
+                        double blockY = (gameAreaPane != null ? gameAreaPane.getLayoutY() : 50) + BORDER_OFFSET + (rowIndex - 2) * cellSize + cellSize / 2;
+                        
+                        int particleCount = 5 + (int)(Math.random() * 6);
+                        for (int i = 0; i < particleCount; i++) {
+                            Particle particle = new Particle(blockX, blockY, originalColor);
+                            if (rootPane != null) {
+                                rootPane.getChildren().add(particle);
+                            } else if (groupNotification != null) {
+                                groupNotification.getChildren().add(particle);
+                            }
+                        }
                         
                         FillTransition flash = new FillTransition(Duration.millis(100), rect);
                         flash.setFromValue(originalColor);

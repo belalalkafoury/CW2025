@@ -186,11 +186,13 @@ public class GameController implements InputEventListener {
         if (isClearing || isCountdown) {
             return new DownData(null, board.getViewData());
         }
+        
         int distance = board.hardDrop();
+        
         if (distance > 0) {
-        if (soundController != null) {
-            soundController.playHardDrop();
-        }
+            if (soundController != null) {
+                soundController.playHardDrop();
+            }
             scoreService.applyHardDrop(distance);
             ClearRow cleared = handleBrickLanding();
             return new DownData(cleared, board.getViewData());
