@@ -29,8 +29,9 @@ public class ScoreService {
 
     public void applyLineClearBonus(ClearRow cleared) {
         if (cleared != null && cleared.getLinesRemoved() > 0) {
+            int basePoints = 50 * cleared.getLinesRemoved() * cleared.getLinesRemoved();
             int comboMultiplier = 1 + score.getCombo();
-            int points = cleared.getScoreBonus() * comboMultiplier;
+            int points = basePoints * comboMultiplier;
             score.add(points);
             score.addLines(cleared.getLinesRemoved());
         }

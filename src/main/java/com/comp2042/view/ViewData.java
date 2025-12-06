@@ -13,7 +13,7 @@ public final class ViewData {
     private final int[][] heldBrickData;
 
     public ViewData(int[][] brickData, int xPosition, int yPosition, List<int[][]> nextPieces, int[][] heldBrickData) {
-        this.brickData = brickData;
+        this.brickData = MatrixOperations.copy(brickData);
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.nextPieces = new ArrayList<>(nextPieces);

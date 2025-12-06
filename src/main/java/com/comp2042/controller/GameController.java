@@ -254,7 +254,8 @@ public class GameController implements InputEventListener {
             
             viewGuiController.animateClear(result.getClearedIndices(), () -> {
                 board.commitClear(result);
-                int scoreBonus = result.getScoreBonus();
+                int linesRemoved = result.getLinesRemoved();
+                int scoreBonus = 50 * linesRemoved * linesRemoved;
                 scoreService.applyLineClearBonus(result);
                 viewGuiController.showScoreAnimation("+" + scoreBonus);
                 

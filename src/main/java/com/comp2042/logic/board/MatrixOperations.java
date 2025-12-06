@@ -115,8 +115,7 @@ public class MatrixOperations {
             rowIndex--;
         }
         
-        int scoreBonus = 50 * clearedRows.size() * clearedRows.size();
-        return new ClearRow(clearedRows.size(), tmp, scoreBonus, clearedRows);
+        return new ClearRow(clearedRows.size(), tmp, clearedRows);
     }
 
     public static List<int[][]> deepCopyList(List<int[][]> list){

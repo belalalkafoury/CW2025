@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 public class GameBoard implements Board {
     private static final int START_X = 4;
     private static final int START_Y = 0;
+    private static final int NEXT_PIECES_COUNT = 3;
+    private static final int PUZZLE_GARBAGE_HEIGHT = 10;
     
     private static final Point[] WALL_KICKS = {
         new Point(0, 0),
@@ -105,7 +107,7 @@ public class GameBoard implements Board {
     public boolean createNewBrick() {
         canHold = true;
         if (nextBricks.isEmpty()) {
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < NEXT_PIECES_COUNT; i++) {
                 nextBricks.add(brickFactory.createRandomBrick());
             }
         }
@@ -139,7 +141,7 @@ public class GameBoard implements Board {
         if (heldBrick == null) {
             heldBrick = currentBrick;
             if (nextBricks.isEmpty()) {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < NEXT_PIECES_COUNT; i++) {
                     nextBricks.add(brickFactory.createRandomBrick());
                 }
             }
@@ -166,12 +168,12 @@ public class GameBoard implements Board {
 
     @Override
     public int[][] getBoardMatrix() {
-        return currentGameMatrix;
+        return MatrixOperations.copy(currentGameMatrix);
     }
     
     @Override
     public int[][] getCurrentShape() {
-        return brickRotator.getCurrentShape();
+        return MatrixOperations.copy(brickRotator.getCurrentShape());
     }
     
     @Override
@@ -228,7 +230,7 @@ public class GameBoard implements Board {
     }
 
     public void setupPuzzleMode() {
-        currentGameMatrix = MatrixOperations.generateGarbage(width, height, 10);
+        currentGameMatrix = MatrixOperations.generateGarbage(width, height, PUZZLE_GARBAGE_HEIGHT);
         currentBrick = null;
         nextBricks.clear();
         heldBrick = null;

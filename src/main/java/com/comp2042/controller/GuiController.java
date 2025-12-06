@@ -10,7 +10,6 @@ import com.comp2042.view.GameModePanel;
 import com.comp2042.view.GameOverPanel;
 import com.comp2042.view.HowToPlayPanel;
 import com.comp2042.view.LeaderboardPanel;
-import com.comp2042.view.NotificationPanel;
 import com.comp2042.view.SettingsPanel;
 import com.comp2042.view.ViewData;
 import javafx.beans.property.BooleanProperty;
@@ -22,7 +21,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -56,6 +54,11 @@ public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
     private static final int NEXT_PIECE_BRICK_SIZE = 16;
+    private static final int CELL_GAP = 1;
+    private static final int BORDER_OFFSET = 8;
+    private static final int ARC_SIZE = 9;
+    private static final int PANEL_OFFSET_X = 12;
+    private static final int PANEL_OFFSET_Y = 42;
 
     @FXML
     private GridPane gamePanel;
@@ -373,16 +376,16 @@ public class GuiController implements Initializable {
         for (int i = 0; i < brick.getBrickData().length; i++) {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
-                rectangle.setArcHeight(9);
-                rectangle.setArcWidth(9);
+                rectangle.setArcHeight(ARC_SIZE);
+                rectangle.setArcWidth(ARC_SIZE);
                 rectangle.setFill(getFillColor(brick.getBrickData()[i][j]));
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
         }
 
-        double cellSize = BRICK_SIZE + 1;
-        double borderOffset = 8;
+        double cellSize = BRICK_SIZE + CELL_GAP;
+        double borderOffset = BORDER_OFFSET;
         brickPanel.setLayoutX(0);
         brickPanel.setLayoutY(0);
         
@@ -422,7 +425,7 @@ public class GuiController implements Initializable {
 
         int rows = boardMatrix.length - 2;
         int cols = boardMatrix[0].length;
-        double cellSize = BRICK_SIZE + 1;
+        double cellSize = BRICK_SIZE + CELL_GAP;
 
         for (int i = 0; i <= rows; i++) {
             Line horizontalLine = new Line(0, i * cellSize, cols * cellSize, i * cellSize);
@@ -480,8 +483,8 @@ public class GuiController implements Initializable {
 
     public void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            double cellSize = BRICK_SIZE + 1;
-            double borderOffset = 8;
+            double cellSize = BRICK_SIZE + CELL_GAP;
+            double borderOffset = BORDER_OFFSET;
             
             updateGhostPiece(brick);
             
@@ -503,12 +506,7 @@ public class GuiController implements Initializable {
             double startY = borderOffset + (currentY - 2) * cellSize;
             brickPanel.setLayoutX(startX);
             brickPanel.setLayoutY(startY);
-            for (int i = 0; i < brick.getBrickData().length; i++) {
-                for (int j = 0; j < brick.getBrickData()[i].length; j++) {
-                    setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
-                    rectangles[i][j].setOpacity(1.0);
-                }
-            }
+            drawBrick(brickPanel, brick.getBrickData(), rectangles);
             updateNextPieces(brick.getNextPieces());
             updateHeldPiece(brick.getHeldBrickData());
         }
@@ -562,16 +560,16 @@ public class GuiController implements Initializable {
                 for (int j = 0; j < shape[i].length; j++) {
                     Rectangle rect = new Rectangle(BRICK_SIZE - 2, BRICK_SIZE - 2);
                     rect.setFill(Color.TRANSPARENT);
-                    rect.setArcHeight(9);
-                    rect.setArcWidth(9);
+                    rect.setArcHeight(ARC_SIZE);
+                    rect.setArcWidth(ARC_SIZE);
                     ghostRectangles[i][j] = rect;
                     ghostPanel.add(rect, j, i);
                 }
             }
         }
 
-        double cellSize = BRICK_SIZE + 1;
-        double borderOffset = 8;
+        double cellSize = BRICK_SIZE + CELL_GAP;
+        double borderOffset = BORDER_OFFSET;
         
         ghostPanel.setLayoutX(0);
         ghostPanel.setLayoutY(0);
@@ -815,8 +813,48 @@ public class GuiController implements Initializable {
 
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(getFillColor(color));
-        rectangle.setArcHeight(9);
-        rectangle.setArcWidth(9);
+        rectangle.setArcHeight(ARC_SIZE);
+        rectangle.setArcWidth(ARC_SIZE);
+    }
+
+    private Rectangle[][] drawMatrixToGrid(GridPane targetGrid, int[][] matrix, int brickSize) {
+        if (targetGrid == null || matrix == null || matrix.length == 0) {
+            return null;
+        }
+
+        targetGrid.getChildren().clear();
+
+        Rectangle[][] rectangles = new Rectangle[matrix.length][];
+        for (int i = 0; i < matrix.length; i++) {
+            if (matrix[i] != null) {
+                rectangles[i] = new Rectangle[matrix[i].length];
+                for (int j = 0; j < matrix[i].length; j++) {
+                    Rectangle rectangle = new Rectangle(brickSize, brickSize);
+                    rectangle.setFill(getFillColor(matrix[i][j]));
+                    setRectangleData(matrix[i][j], rectangle);
+                    rectangles[i][j] = rectangle;
+                    targetGrid.add(rectangle, j, i);
+                }
+            }
+        }
+        return rectangles;
+    }
+
+    private void drawBrick(GridPane targetPanel, int[][] shapeData, Rectangle[][] rectArray) {
+        if (targetPanel == null || shapeData == null || shapeData.length == 0) {
+            return;
+        }
+
+        for (int i = 0; i < shapeData.length; i++) {
+            if (shapeData[i] != null && rectArray != null && rectArray[i] != null) {
+                for (int j = 0; j < shapeData[i].length; j++) {
+                    if (rectArray[i][j] != null) {
+                        setRectangleData(shapeData[i][j], rectArray[i][j]);
+                        rectArray[i][j].setOpacity(1.0);
+                    }
+                }
+            }
+        }
     }
 
     private void moveDown(MoveEvent event) {
@@ -975,23 +1013,7 @@ public class GuiController implements Initializable {
 
     private void updateHeldPiece(int[][] heldBrickData) {
         if (holdPanel == null) return;
-
-        holdPanel.getChildren().clear();
-
-        if (heldBrickData == null || heldBrickData.length == 0) {
-            return;
-        }
-
-        for (int i = 0; i < heldBrickData.length; i++) {
-            if (heldBrickData[i] != null) {
-                for (int j = 0; j < heldBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(NEXT_PIECE_BRICK_SIZE, NEXT_PIECE_BRICK_SIZE);
-                    rectangle.setFill(getFillColor(heldBrickData[i][j]));
-                    setRectangleData(heldBrickData[i][j], rectangle);
-                    holdPanel.add(rectangle, j, i);
-                }
-            }
-        }
+        drawMatrixToGrid(holdPanel, heldBrickData, NEXT_PIECE_BRICK_SIZE);
     }
 
     private void updateNextPieces(List<int[][]> nextShapes) {
@@ -1003,29 +1025,8 @@ public class GuiController implements Initializable {
             GridPane grid = grids[pieceIndex];
             if (grid == null) continue;
 
-            grid.getChildren().clear();
-
             int[][] nextBrickData = nextShapes.get(pieceIndex);
-            if (nextBrickData == null || nextBrickData.length == 0) continue;
-
-            Rectangle[][] rects = new Rectangle[nextBrickData.length][];
-            for (int i = 0; i < nextBrickData.length; i++) {
-                if (nextBrickData[i] != null) {
-                    rects[i] = new Rectangle[nextBrickData[i].length];
-                }
-            }
-
-            for (int i = 0; i < nextBrickData.length; i++) {
-                if (nextBrickData[i] != null) {
-                    for (int j = 0; j < nextBrickData[i].length; j++) {
-                        Rectangle rectangle = new Rectangle(NEXT_PIECE_BRICK_SIZE, NEXT_PIECE_BRICK_SIZE);
-                        rectangle.setFill(getFillColor(nextBrickData[i][j]));
-                        setRectangleData(nextBrickData[i][j], rectangle);
-                        rects[i][j] = rectangle;
-                        grid.add(rectangle, j, i);
-                    }
-                }
-            }
+            Rectangle[][] rects = drawMatrixToGrid(grid, nextBrickData, NEXT_PIECE_BRICK_SIZE);
 
             if (pieceIndex == 0) {
                 nextPiece1Rectangles = rects;
