@@ -1,17 +1,32 @@
 package com.comp2042.logic.bricks;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class BrickFactory {
 
     private final Random random;
+    private final List<BrickType> bag = new ArrayList<>();
 
     public BrickFactory() {
         this.random = new Random();
+        refillBag();
     }
 
     public BrickFactory(Random random) {
         this.random = random;
+        refillBag();
+    }
+
+    private void refillBag() {
+        bag.clear();
+        BrickType[] types = BrickType.values();
+        for (BrickType type : types) {
+            bag.add(type);
+        }
+        Collections.shuffle(bag, random);
     }
 
     public Brick createBrick(BrickType type) {
@@ -36,8 +51,10 @@ public class BrickFactory {
     }
 
     public Brick createRandomBrick() {
-        BrickType[] types = BrickType.values();
-        BrickType randomType = types[random.nextInt(types.length)];
-        return createBrick(randomType);
+        if (bag.isEmpty()) {
+            refillBag();
+        }
+        BrickType nextType = bag.remove(0);
+        return createBrick(nextType);
     }
 }
