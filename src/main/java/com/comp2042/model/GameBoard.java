@@ -306,4 +306,19 @@ public class GameBoard implements Board {
         return ghostY;
     }
 
+    Brick getCurrentBrickForTest() {
+        return currentBrick;
+    }
+
+    Brick getHeldBrickForTest() {
+        return heldBrick;
+    }
+
+    boolean canHoldForTest() {
+        return canHold;
+    }
+
+    Point getCurrentOffsetForTest() {
+        return new Point(currentOffset);
+    }
 }
