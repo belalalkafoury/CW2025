@@ -8,12 +8,23 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import java.util.Random;
 
+/**
+ * Represents a single particle in the explosion animation effect.
+ * Particles are created when lines are cleared and animate outward with fade and translation effects.
+ */
 public class Particle extends Rectangle {
     private static final Random random = new Random();
     private static final int PARTICLE_SIZE = 5;
     private static final double VELOCITY_RANGE = 50.0;
     private static final double ANIMATION_DURATION = 500.0;
 
+    /**
+     * Constructs a particle at the specified position with the given color.
+     * Automatically starts the animation sequence.
+     * @param x X coordinate for the particle's initial position
+     * @param y Y coordinate for the particle's initial position
+     * @param color Color of the particle
+     */
     public Particle(double x, double y, Color color) {
         super(PARTICLE_SIZE, PARTICLE_SIZE, color);
         setLayoutX(x);

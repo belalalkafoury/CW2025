@@ -51,6 +51,11 @@ import java.util.List;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Manages the GUI and view updates for the Tetris game.
+ * Handles rendering of the game board, bricks, ghost pieces, animations, and UI panels.
+ * Coordinates between the game logic and JavaFX UI components.
+ */
 public class GuiController implements Initializable {
 
     private static final int BRICK_SIZE = 20;
@@ -194,6 +199,11 @@ public class GuiController implements Initializable {
 
     private SoundController soundController;
 
+    /**
+     * Initializes the GUI controller and sets up UI components.
+     * @param location The location used to resolve relative paths for the root object
+     * @param resources The resources used to localize the root object
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
@@ -348,6 +358,12 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Initializes the game view with the board matrix and initial brick data.
+     * Creates the game board grid if it doesn't exist.
+     * @param boardMatrix The initial game board state
+     * @param brick The initial brick view data
+     */
     public void initGameView(int[][] boardMatrix, ViewData brick) {
         resetView();
 
@@ -484,7 +500,10 @@ public class GuiController implements Initializable {
         return returnPaint;
     }
 
-
+    /**
+     * Refreshes the display of the current falling brick and ghost piece.
+     * @param brick The view data containing current brick position and shape
+     */
     public void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
             double cellSize = BRICK_SIZE + CELL_GAP;
@@ -605,6 +624,10 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Refreshes the game board background with the current board state.
+     * @param board The current game board matrix
+     */
     public void refreshGameBackground(int[][] board) {
         if (displayMatrix == null) {
             return;
@@ -625,24 +648,38 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Hides the ghost piece preview.
+     */
     public void hideGhostPiece() {
         if (ghostPanel != null) {
             ghostPanel.setVisible(false);
         }
     }
 
+    /**
+     * Hides the falling brick display.
+     */
     public void hideFallingBrick() {
         if (brickPanel != null) {
             brickPanel.setVisible(false);
         }
     }
 
+    /**
+     * Shows the falling brick display.
+     */
     public void showFallingBrick() {
         if (brickPanel != null) {
             brickPanel.setVisible(true);
         }
     }
 
+    /**
+     * Animates the clearing of specified rows with particle effects.
+     * @param rows List of row indices to clear
+     * @param onFinished Callback to execute when animation completes
+     */
     public void animateClear(List<Integer> rows, Runnable onFinished) {
         if (rows == null || rows.isEmpty() || displayMatrix == null) {
             if (onFinished != null) {
@@ -883,6 +920,10 @@ public class GuiController implements Initializable {
         gamePanel.requestFocus();
     }
 
+    /**
+     * Sets the event listener for input events.
+     * @param eventListener The listener to handle game input events
+     */
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
         if (eventListener instanceof GameController) {
@@ -893,14 +934,27 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Sets the game board instance.
+     * @param board The Board instance to use
+     */
     public void setBoard(Board board) {
         this.board = board;
     }
 
+    /**
+     * Binds the score label to a score property for reactive updates.
+     * @param integerProperty The score property to bind
+     */
     public void bindScore(IntegerProperty integerProperty) {
         scoreLabel.textProperty().bind(integerProperty.asString("%d"));
     }
 
+    /**
+     * Binds the lines label to a lines property and updates level based on lines cleared.
+     * @param integerProperty The lines property to bind
+     * @param soundController The sound controller for level-up sounds
+     */
     public void bindLines(IntegerProperty integerProperty, SoundController soundController) {
         this.soundController = soundController;
         if (settingsPanel != null) {
@@ -933,6 +987,12 @@ public class GuiController implements Initializable {
         });
     }
 
+    /**
+     * Configures the UI for Time Attack mode.
+     * Updates labels to show time and target score instead of level and lines.
+     * @param initialTime Initial time remaining in seconds
+     * @param targetScore Target score to achieve
+     */
     public void configureTimeAttackMode(int initialTime, int targetScore) {
         if (levelHeaderLabel != null) {
             levelHeaderLabel.setText("TIME");
@@ -948,6 +1008,10 @@ public class GuiController implements Initializable {
         updateTimer(initialTime);
     }
 
+    /**
+     * Updates the timer display for Time Attack mode.
+     * @param seconds The number of seconds remaining
+     */
     public void updateTimer(int seconds) {
         if (levelLabel != null) {
             int minutes = seconds / 60;
@@ -957,6 +1021,11 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Configures the UI for Puzzle mode.
+     * Updates labels to show lines cleared and goal.
+     * @param lineGoal The target number of lines to clear
+     */
     public void configurePuzzleMode(int lineGoal) {
         if (levelHeaderLabel != null) {
             levelHeaderLabel.setText("GOAL");
@@ -1025,6 +1094,10 @@ public class GuiController implements Initializable {
         gamePanel.requestFocus();
     }
 
+    /**
+     * Sets the animation controller for managing game animations.
+     * @param animationController The AnimationController instance
+     */
     public void setAnimationController(AnimationController animationController) {
         this.animationController = animationController;
     }
@@ -1056,6 +1129,10 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Displays the game over screen and saves the score if applicable.
+     * @param soundController The sound controller for playing game over sounds
+     */
     public void gameOver(SoundController soundController) {
         hideGhostPiece();
         if (brickPanel != null) {
@@ -1107,6 +1184,10 @@ public class GuiController implements Initializable {
         isGameOver.setValue(Boolean.TRUE);
     }
 
+    /**
+     * Displays the win screen and saves the score if applicable.
+     * @param soundController The sound controller for playing win sounds
+     */
     public void gameWin(SoundController soundController) {
         hideGhostPiece();
         if (brickPanel != null) {
@@ -1285,6 +1366,11 @@ public class GuiController implements Initializable {
         }
     }
 
+    /**
+     * Displays a countdown animation (3, 2, 1, GO!) before starting the game.
+     * @param soundController The sound controller for countdown audio
+     * @param onComplete Callback to execute when countdown finishes
+     */
     public void showCountdown(SoundController soundController, Runnable onComplete) {
         if (countdownOverlay == null || countdownLabel == null) {
             if (onComplete != null) {

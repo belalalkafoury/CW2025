@@ -15,12 +15,20 @@ import javafx.util.Duration;
 
 import java.io.InputStream;
 
+/**
+ * Animated logo component displaying "TETRIS" with interactive effects.
+ * Features custom font loading, beveled gradients, glow effects, and hover/click animations.
+ */
 public class TetrisLogo extends HBox {
     private static final double FONT_SIZE = 100;
     private Text[] letters;
     private Color[] letterColors;
     private Font tetricideFont;
     
+    /**
+     * Constructs a TetrisLogo with animated letters and interactive effects.
+     * Loads custom font, creates styled letters, and sets up hover/click animations.
+     */
     public TetrisLogo() {
         super(5);
         setAlignment(javafx.geometry.Pos.CENTER);
