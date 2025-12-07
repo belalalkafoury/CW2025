@@ -1,0 +1,9 @@
+com.comp2042.controller
+com.comp2042.logic.board
+com.comp2042.logic.board.rotation
+com.comp2042.logic.bricks
+com.comp2042.logic.collision
+com.comp2042.logic.score
+com.comp2042.main
+com.comp2042.model
+com.comp2042.view
