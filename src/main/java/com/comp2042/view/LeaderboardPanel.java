@@ -21,6 +21,11 @@ import javafx.application.Platform;
 
 import java.util.List;
 
+/**
+ * Panel displaying high scores for different game modes.
+ * Allows switching between game modes (Classic, Time Attack, Puzzle, Reverted)
+ * and displays the top 10 scores for the selected mode.
+ */
 public class LeaderboardPanel extends StackPane {
     private Label titleLabel;
     private VBox scoresContainer;
@@ -36,6 +41,10 @@ public class LeaderboardPanel extends StackPane {
     private Button revertedButton;
     private HBox modeButtonsContainer;
 
+    /**
+     * Constructs a LeaderboardPanel with mode selection buttons and score display.
+     * Loads custom font and initializes the UI components.
+     */
     public LeaderboardPanel() {
         setAlignment(Pos.CENTER);
         setBackground(Background.EMPTY);
@@ -53,6 +62,10 @@ public class LeaderboardPanel extends StackPane {
         createContent();
     }
 
+    /**
+     * Sets the HighScoreManager and refreshes the display.
+     * @param highScoreManager The HighScoreManager to use for retrieving scores
+     */
     public void setHighScoreManager(HighScoreManager highScoreManager) {
         this.highScoreManager = highScoreManager;
         refresh();
@@ -245,6 +258,10 @@ public class LeaderboardPanel extends StackPane {
         return button;
     }
 
+    /**
+     * Refreshes the leaderboard display with scores for the current game mode.
+     * Clears existing scores and populates with top scores from the HighScoreManager.
+     */
     public void refresh() {
         scoresContainer.getChildren().clear();
         
@@ -312,6 +329,9 @@ public class LeaderboardPanel extends StackPane {
         return row;
     }
 
+    /**
+     * Plays an entrance animation for the panel (fade in and scale up).
+     */
     public void playAnimation() {
         setVisible(true);
         menuPanel.setOpacity(0);
@@ -332,6 +352,10 @@ public class LeaderboardPanel extends StackPane {
         animation.play();
     }
 
+    /**
+     * Gets the back button for navigation.
+     * @return The back button component
+     */
     public Button getBackButton() {
         return backButton;
     }
