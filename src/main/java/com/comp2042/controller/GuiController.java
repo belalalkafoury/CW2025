@@ -610,7 +610,12 @@ public class GuiController implements Initializable {
     }
 
     public void animatePlacedBlocks(ViewData lastBrick) {
-        if (lastBrick == null || displayMatrix == null) {
+        if (lastBrick == null || gameBoardRenderer == null) {
+            return;
+        }
+
+        Rectangle[][] displayMatrix = gameBoardRenderer.getDisplayMatrix();
+        if (displayMatrix == null) {
             return;
         }
 

@@ -5,11 +5,10 @@ import com.comp2042.model.Board;
 import com.comp2042.model.GameMode;
 import com.comp2042.logic.board.ClearRow;
 import com.comp2042.logic.board.DownData;
+import com.comp2042.logic.mode.GameModeStrategy;
+import com.comp2042.logic.mode.GameModeStrategyFactory;
+import com.comp2042.logic.mode.TimeAttackModeStrategy;
 import com.comp2042.view.ViewData;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-import java.util.Random;
 
 /**
  * Orchestrates the game loop and coordinates between the board, view, and game logic.
@@ -31,15 +30,12 @@ public class GameController implements InputEventListener {
     private final SoundController soundController;
 
     private final GameMode gameMode;
+    private final GameModeStrategy modeStrategy;
 
     private boolean isClearing = false;
 
     private boolean isCountdown = true;
 
-    private int timeAttackTargetScore;
-    private int timeAttackSecondsRemaining;
-    private Timeline gameTimer;
-    private boolean isTimeAttackActive = false;
     private boolean gameWon = false;
     private boolean gameLost = false;
     private String playerName = "GUEST";
@@ -69,6 +65,7 @@ public class GameController implements InputEventListener {
         this.board = board;
         this.soundController = soundController;
         this.gameMode = gameMode;
+        this.modeStrategy = GameModeStrategyFactory.createStrategy(gameMode);
         this.playerName = playerName != null && !playerName.trim().isEmpty() ? playerName.trim().toUpperCase() : "GUEST";
 
         if (soundController != null) {
@@ -86,28 +83,40 @@ public class GameController implements InputEventListener {
         viewGuiController.setAnimationController(this.animationController);
         this.scoreService = new ScoreService(board.getScore());
         
-        if (gameMode == GameMode.TIME_ATTACK) {
-            initializeTimeAttackMode();
-        } else if (gameMode == GameMode.PUZZLE) {
-            board.setupPuzzleMode();
-            viewGuiController.configurePuzzleMode(com.comp2042.util.GameConstants.PUZZLE_MODE_TARGET_LINES);
-            viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        } else {
-            viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
-        }
+        modeStrategy.initialize(board, viewGuiController, soundController);
 
         board.getScore().scoreProperty().addListener((obs, oldVal, newVal) -> {
-            if (isTimeAttackActive && !gameWon && !gameLost) {
-                checkWinCondition(newVal.intValue());
+            if (!gameWon && !gameLost && modeStrategy.checkWinCondition(board, viewGuiController, soundController)) {
+                gameWon = true;
+                modeStrategy.stop();
+                animationController.stop();
+                
+                if (soundController != null) {
+                    soundController.playLevelUp();
+                }
+                
+                viewGuiController.gameWin(soundController);
+            }
+            
+            if (!gameWon && !gameLost && modeStrategy.checkLossCondition(board, viewGuiController, soundController)) {
+                gameLost = true;
+                modeStrategy.stop();
+                animationController.stop();
+                viewGuiController.gameOver(soundController);
             }
         });
 
         board.getScore().linesProperty().addListener((obs, oldVal, newVal) -> {
-            if (gameMode == GameMode.PUZZLE && !gameWon && !gameLost) {
-                if (newVal.intValue() >= 40) {
-                    checkPuzzleWinCondition();
+            if (!gameWon && !gameLost && modeStrategy.checkWinCondition(board, viewGuiController, soundController)) {
+                gameWon = true;
+                modeStrategy.stop();
+                animationController.stop();
+                
+                if (soundController != null) {
+                    soundController.playLevelUp();
                 }
+                
+                viewGuiController.gameWin(soundController);
             }
         });
 
@@ -119,8 +128,9 @@ public class GameController implements InputEventListener {
         viewGuiController.showCountdown(soundController, () -> {
             isCountdown = false;
             animationController.start();
-            if (isTimeAttackActive && gameTimer != null) {
-                gameTimer.play();
+            if (modeStrategy instanceof TimeAttackModeStrategy) {
+                TimeAttackModeStrategy timeAttackStrategy = (TimeAttackModeStrategy) modeStrategy;
+                timeAttackStrategy.startTimer();
             }
         });
     }
@@ -258,7 +268,7 @@ public class GameController implements InputEventListener {
      */
     @Override
     public void createNewGame() {
-        stopGameTimer();
+        modeStrategy.stop();
         gameWon = false;
         gameLost = false;
         board.newGame();
@@ -266,13 +276,7 @@ public class GameController implements InputEventListener {
         isCountdown = true;
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
         
-        if (gameMode == GameMode.TIME_ATTACK) {
-            initializeTimeAttackMode();
-        } else if (gameMode == GameMode.PUZZLE) {
-            board.setupPuzzleMode();
-            viewGuiController.configurePuzzleMode(40);
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        }
+        modeStrategy.reset(board, viewGuiController);
         
         if (soundController != null) {
             soundController.playCountdown();
@@ -280,8 +284,11 @@ public class GameController implements InputEventListener {
         viewGuiController.showCountdown(soundController, () -> {
             isCountdown = false;
             animationController.start();
-            if (isTimeAttackActive && gameTimer != null) {
-                gameTimer.play();
+            if (modeStrategy instanceof TimeAttackModeStrategy) {
+                TimeAttackModeStrategy timeAttackStrategy = (TimeAttackModeStrategy) modeStrategy;
+                if (timeAttackStrategy.shouldStartTimer()) {
+                    timeAttackStrategy.resume();
+                }
             }
         });
     }
@@ -325,7 +332,7 @@ public class GameController implements InputEventListener {
                 viewGuiController.refreshGameBackground(board.getBoardMatrix());
                 
                 if (!board.createNewBrick()) {
-                    stopGameTimer();
+                    modeStrategy.stop();
                     animationController.stop();
                     viewGuiController.gameOver(soundController);
                     isClearing = false;
@@ -338,7 +345,7 @@ public class GameController implements InputEventListener {
             board.getScore().resetCombo();
             scoreService.applyLineClearBonus(result);
             if (!board.createNewBrick()) {
-                stopGameTimer();
+                modeStrategy.stop();
                 animationController.stop();
                 viewGuiController.gameOver(soundController);
             } else {
@@ -359,111 +366,17 @@ public class GameController implements InputEventListener {
     }
 
     /**
-     * Initializes Time Attack mode with random time limit and target score.
-     * Sets up a timer that counts down and checks win/loss conditions.
-     */
-    private void initializeTimeAttackMode() {
-        isTimeAttackActive = true;
-        Random random = new Random();
-        
-        timeAttackSecondsRemaining = 30 + random.nextInt(91);
-        
-        int pointsPerSecond = 30 + random.nextInt(21);
-        
-        timeAttackTargetScore = timeAttackSecondsRemaining * pointsPerSecond;
-        timeAttackTargetScore = ((timeAttackTargetScore + 50) / 100) * 100;
-        
-        if (timeAttackTargetScore == 0) {
-            timeAttackTargetScore = 100;
-        }
-        
-        viewGuiController.configureTimeAttackMode(timeAttackSecondsRemaining, timeAttackTargetScore);
-        
-        gameTimer = new Timeline(new KeyFrame(
-            Duration.seconds(1),
-            e -> {
-                timeAttackSecondsRemaining--;
-                viewGuiController.updateTimer(timeAttackSecondsRemaining);
-                
-                if (timeAttackSecondsRemaining <= 0) {
-                    checkLossCondition();
-                }
-            }
-        ));
-        gameTimer.setCycleCount(Timeline.INDEFINITE);
-    }
-
-    /**
-     * Checks if the win condition for Time Attack mode has been met.
-     * @param currentScore The current score to check against the target
-     */
-    private void checkWinCondition(int currentScore) {
-        if (currentScore >= timeAttackTargetScore && !gameWon && !gameLost) {
-            gameWon = true;
-            stopGameTimer();
-            animationController.stop();
-            
-            if (soundController != null) {
-                soundController.playLevelUp();
-            }
-            
-            viewGuiController.gameWin(soundController);
-        }
-    }
-
-    /**
-     * Checks if the loss condition for Time Attack mode has been met (time expired).
-     */
-    private void checkLossCondition() {
-        if (timeAttackSecondsRemaining <= 0 && !gameWon && !gameLost) {
-            gameLost = true;
-            stopGameTimer();
-            animationController.stop();
-            viewGuiController.gameOver(soundController);
-        }
-    }
-
-    /**
-     * Checks if the win condition for Puzzle mode has been met (40 lines cleared).
-     */
-    private void checkPuzzleWinCondition() {
-        if (board.getScore().getLinesValue() >= 40 && !gameWon && !gameLost) {
-            gameWon = true;
-            animationController.stop();
-            
-            if (soundController != null) {
-                soundController.playLevelUp();
-            }
-            
-            viewGuiController.gameWin(soundController);
-        }
-    }
-
-    /**
-     * Stops the game timer if it exists.
-     */
-    private void stopGameTimer() {
-        if (gameTimer != null) {
-            gameTimer.stop();
-        }
-    }
-
-    /**
-     * Pauses the Time Attack mode timer.
+     * Pauses the game mode timer.
      */
     public void pauseTimer() {
-        if (gameTimer != null && isTimeAttackActive) {
-            gameTimer.pause();
-        }
+        modeStrategy.pause();
     }
 
     /**
-     * Resumes the Time Attack mode timer.
+     * Resumes the game mode timer.
      */
     public void resumeTimer() {
-        if (gameTimer != null && isTimeAttackActive) {
-            gameTimer.play();
-        }
+        modeStrategy.resume();
     }
 
     /**
