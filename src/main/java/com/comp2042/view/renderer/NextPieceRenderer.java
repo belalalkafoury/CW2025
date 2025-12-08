@@ -1,8 +1,7 @@
 package com.comp2042.view.renderer;
 
+import com.comp2042.util.BrickColorMapper;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 import java.util.List;
@@ -101,7 +100,7 @@ public class NextPieceRenderer {
                 rectangles[i] = new Rectangle[matrix[i].length];
                 for (int j = 0; j < matrix[i].length; j++) {
                     Rectangle rectangle = new Rectangle(brickSize, brickSize);
-                    rectangle.setFill(getFillColor(matrix[i][j]));
+                    rectangle.setFill(BrickColorMapper.getFillColor(matrix[i][j]));
                     setRectangleData(matrix[i][j], rectangle);
                     rectangles[i][j] = rectangle;
                     targetGrid.add(rectangle, j, i);
@@ -112,43 +111,9 @@ public class NextPieceRenderer {
     }
     
     private void setRectangleData(int color, Rectangle rectangle) {
-        rectangle.setFill(getFillColor(color));
+        rectangle.setFill(BrickColorMapper.getFillColor(color));
         rectangle.setArcHeight(ARC_SIZE);
         rectangle.setArcWidth(ARC_SIZE);
-    }
-    
-    private Paint getFillColor(int i) {
-        Paint returnPaint;
-        switch (i) {
-            case 0:
-                returnPaint = Color.TRANSPARENT;
-                break;
-            case 1:
-                returnPaint = Color.AQUA;
-                break;
-            case 2:
-                returnPaint = Color.BLUEVIOLET;
-                break;
-            case 3:
-                returnPaint = Color.DARKGREEN;
-                break;
-            case 4:
-                returnPaint = Color.YELLOW;
-                break;
-            case 5:
-                returnPaint = Color.RED;
-                break;
-            case 6:
-                returnPaint = Color.ORANGE;
-                break;
-            case 7:
-                returnPaint = Color.BURLYWOOD;
-                break;
-            default:
-                returnPaint = Color.WHITE;
-                break;
-        }
-        return returnPaint;
     }
 }
 

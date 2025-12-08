@@ -16,6 +16,8 @@ import com.comp2042.view.Particle;
 import com.comp2042.view.renderer.GameBoardRenderer;
 import com.comp2042.view.renderer.GhostPieceRenderer;
 import com.comp2042.view.renderer.NextPieceRenderer;
+import com.comp2042.util.BrickColorMapper;
+import com.comp2042.view.animation.AnimationFactory;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -373,7 +375,7 @@ public class GuiController implements Initializable {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
                 rectangle.setArcHeight(ARC_SIZE);
                 rectangle.setArcWidth(ARC_SIZE);
-                rectangle.setFill(getFillColor(brick.getBrickData()[i][j]));
+                rectangle.setFill(BrickColorMapper.getFillColor(brick.getBrickData()[i][j]));
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
@@ -400,39 +402,6 @@ public class GuiController implements Initializable {
         }
     }
 
-    private Paint getFillColor(int i) {
-        Paint returnPaint;
-        switch (i) {
-            case 0:
-                returnPaint = Color.TRANSPARENT;
-                break;
-            case 1:
-                returnPaint = Color.AQUA;
-                break;
-            case 2:
-                returnPaint = Color.BLUEVIOLET;
-                break;
-            case 3:
-                returnPaint = Color.DARKGREEN;
-                break;
-            case 4:
-                returnPaint = Color.YELLOW;
-                break;
-            case 5:
-                returnPaint = Color.RED;
-                break;
-            case 6:
-                returnPaint = Color.BEIGE;
-                break;
-            case 7:
-                returnPaint = Color.BURLYWOOD;
-                break;
-            default:
-                returnPaint = Color.WHITE;
-                break;
-        }
-        return returnPaint;
-    }
 
     /**
      * Refreshes the display of the current falling brick and ghost piece.
@@ -633,11 +602,7 @@ public class GuiController implements Initializable {
                             boardCol >= 0 && boardCol < displayMatrix[0].length) {
                         Rectangle rect = displayMatrix[boardRow][boardCol];
                         if (rect != null) {
-                            FadeTransition blink = new FadeTransition(Duration.millis(150), rect);
-                            blink.setFromValue(1.0);
-                            blink.setToValue(0.3);
-                            blink.setCycleCount(4);
-                            blink.setAutoReverse(true);
+                            FadeTransition blink = AnimationFactory.createBlinkAnimation(rect, 150, 4);
                             blink.play();
                         }
                     }
@@ -650,49 +615,9 @@ public class GuiController implements Initializable {
         if (groupNotification == null) {
             return;
         }
-
-        Text textNode = new Text(text);
-        if (com.comp2042.util.FontLoader.loadPressStart2P(20)) {
-            textNode.setFont(Font.font("Press Start 2P", 20));
-        } else {
-            textNode.setFont(Font.font("Arial", 20));
-        }
-        textNode.setFill(color);
-        textNode.setStroke(Color.WHITE);
-        textNode.setStrokeWidth(1);
-        
-        DropShadow dropShadow = new DropShadow();
-        dropShadow.setColor(color);
-        dropShadow.setRadius(10);
-        dropShadow.setSpread(0.5);
-        textNode.setEffect(dropShadow);
-
-        groupNotification.getChildren().add(textNode);
-        
-        javafx.application.Platform.runLater(() -> {
-            double textWidth = textNode.getBoundsInLocal().getWidth();
-            textNode.setLayoutX(x - (textWidth / 2));
-        });
-        
-        textNode.setLayoutX(x);
-        textNode.setLayoutY(y);
-
-        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300), textNode);
-        scaleTransition.setFromX(0.5);
-        scaleTransition.setFromY(0.5);
-        scaleTransition.setToX(1.0);
-        scaleTransition.setToY(1.0);
-
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(1000), textNode);
-        fadeTransition.setFromValue(1.0);
-        fadeTransition.setToValue(0.0);
-
-        TranslateTransition translateTransition = new TranslateTransition(Duration.millis(1000), textNode);
-        translateTransition.setByY(-50);
-
-        ParallelTransition parallelTransition = new ParallelTransition(scaleTransition, fadeTransition, translateTransition);
-        parallelTransition.setOnFinished(e -> groupNotification.getChildren().remove(textNode));
-        parallelTransition.play();
+        ParallelTransition animation = AnimationFactory.createFloatingTextAnimation(
+            text, x, y, color, groupNotification);
+        animation.play();
     }
 
     public void showComboAnimation(int combo) {
@@ -724,7 +649,7 @@ public class GuiController implements Initializable {
     }
 
     private void setRectangleData(int color, Rectangle rectangle) {
-        rectangle.setFill(getFillColor(color));
+        rectangle.setFill(BrickColorMapper.getFillColor(color));
         rectangle.setArcHeight(ARC_SIZE);
         rectangle.setArcWidth(ARC_SIZE);
     }
@@ -742,7 +667,7 @@ public class GuiController implements Initializable {
                 rectangles[i] = new Rectangle[matrix[i].length];
                 for (int j = 0; j < matrix[i].length; j++) {
                     Rectangle rectangle = new Rectangle(brickSize, brickSize);
-                    rectangle.setFill(getFillColor(matrix[i][j]));
+                    rectangle.setFill(BrickColorMapper.getFillColor(matrix[i][j]));
                     setRectangleData(matrix[i][j], rectangle);
                     rectangles[i][j] = rectangle;
                     targetGrid.add(rectangle, j, i);

@@ -1,6 +1,7 @@
 package com.comp2042.view.renderer;
 
 import com.comp2042.model.Board;
+import com.comp2042.util.BrickColorMapper;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -108,7 +109,7 @@ public class GhostPieceRenderer {
                 if (i < ghostRectangles.length && j < ghostRectangles[i].length) {
                     Rectangle rect = ghostRectangles[i][j];
                     if (shape[i][j] != 0) {
-                        Paint color = getFillColor(shape[i][j]);
+                        Paint color = BrickColorMapper.getFillColor(shape[i][j]);
                         if (color instanceof Color) {
                             rect.setFill(Color.TRANSPARENT);
                             rect.setStroke((Color) color);
@@ -132,40 +133,6 @@ public class GhostPieceRenderer {
         if (ghostPanel != null) {
             ghostPanel.setVisible(false);
         }
-    }
-    
-    private Paint getFillColor(int i) {
-        Paint returnPaint;
-        switch (i) {
-            case 0:
-                returnPaint = Color.TRANSPARENT;
-                break;
-            case 1:
-                returnPaint = Color.AQUA;
-                break;
-            case 2:
-                returnPaint = Color.BLUEVIOLET;
-                break;
-            case 3:
-                returnPaint = Color.DARKGREEN;
-                break;
-            case 4:
-                returnPaint = Color.YELLOW;
-                break;
-            case 5:
-                returnPaint = Color.RED;
-                break;
-            case 6:
-                returnPaint = Color.ORANGE;
-                break;
-            case 7:
-                returnPaint = Color.BURLYWOOD;
-                break;
-            default:
-                returnPaint = Color.WHITE;
-                break;
-        }
-        return returnPaint;
     }
 }
 

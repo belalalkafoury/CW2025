@@ -298,63 +298,83 @@ public class GameController implements InputEventListener {
      * @return ClearRow object containing information about cleared rows
      */
     private ClearRow handleBrickLanding() {
-        ViewData lastBrick = board.getViewData();
-        viewGuiController.hideGhostPiece();
-        
-        board.mergeBrickToBackground();
-        
-        viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        
-        viewGuiController.hideFallingBrick();
-        
+        ViewData lastBrick = mergeBrickToBoard();
         ClearRow result = board.checkClears();
         
         if (result.getLinesRemoved() > 0) {
-            isClearing = true;
-            board.getScore().incrementCombo();
-            int comboValue = board.getScore().getCombo();
-            
-            if (soundController != null) {
-                soundController.playComboSound(comboValue);
-            }
-            
-            if (comboValue >= 2) {
-                viewGuiController.showComboAnimation(comboValue);
-            }
-            
-            viewGuiController.animateClear(result.getClearedIndices(), () -> {
-                board.commitClear(result);
-                int linesRemoved = result.getLinesRemoved();
-                int scoreBonus = 50 * linesRemoved * linesRemoved;
-                scoreService.applyLineClearBonus(result);
-                viewGuiController.showScoreAnimation("+" + scoreBonus);
-                
-                viewGuiController.refreshGameBackground(board.getBoardMatrix());
-                
-                if (!board.createNewBrick()) {
-                    modeStrategy.stop();
-                    animationController.stop();
-                    viewGuiController.gameOver(soundController);
-                    isClearing = false;
-                } else {
-                    viewGuiController.showFallingBrick();
-                    isClearing = false;
-                }
-            });
+            handleLineClears(result);
         } else {
-            board.getScore().resetCombo();
-            scoreService.applyLineClearBonus(result);
-            if (!board.createNewBrick()) {
-                modeStrategy.stop();
-                animationController.stop();
-                viewGuiController.gameOver(soundController);
-            } else {
-                viewGuiController.showFallingBrick();
-            }
-            viewGuiController.animatePlacedBlocks(lastBrick);
+            handleNoClears(result, lastBrick);
         }
         
         return result;
+    }
+    
+    /**
+     * Merges the current brick to the board and updates the view.
+     * @return The view data of the brick that was merged
+     */
+    private ViewData mergeBrickToBoard() {
+        ViewData lastBrick = board.getViewData();
+        viewGuiController.hideGhostPiece();
+        board.mergeBrickToBackground();
+        viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        viewGuiController.hideFallingBrick();
+        return lastBrick;
+    }
+    
+    /**
+     * Handles the logic when lines are cleared.
+     * @param result The ClearRow containing information about cleared lines
+     */
+    private void handleLineClears(ClearRow result) {
+        isClearing = true;
+        board.getScore().incrementCombo();
+        int comboValue = board.getScore().getCombo();
+        
+        if (soundController != null) {
+            soundController.playComboSound(comboValue);
+        }
+        
+        if (comboValue >= 2) {
+            viewGuiController.showComboAnimation(comboValue);
+        }
+        
+        viewGuiController.animateClear(result.getClearedIndices(), () -> {
+            board.commitClear(result);
+            int linesRemoved = result.getLinesRemoved();
+            int scoreBonus = 50 * linesRemoved * linesRemoved;
+            scoreService.applyLineClearBonus(result);
+            viewGuiController.showScoreAnimation("+" + scoreBonus);
+            viewGuiController.refreshGameBackground(board.getBoardMatrix());
+            spawnNewBrickOrGameOver();
+            isClearing = false;
+        });
+    }
+    
+    /**
+     * Handles the logic when no lines are cleared.
+     * @param result The ClearRow result (with 0 lines removed)
+     * @param lastBrick The view data of the brick that was placed
+     */
+    private void handleNoClears(ClearRow result, ViewData lastBrick) {
+        board.getScore().resetCombo();
+        scoreService.applyLineClearBonus(result);
+        viewGuiController.animatePlacedBlocks(lastBrick);
+        spawnNewBrickOrGameOver();
+    }
+    
+    /**
+     * Attempts to spawn a new brick or triggers game over if spawning fails.
+     */
+    private void spawnNewBrickOrGameOver() {
+        if (!board.createNewBrick()) {
+            modeStrategy.stop();
+            animationController.stop();
+            viewGuiController.gameOver(soundController);
+        } else {
+            viewGuiController.showFallingBrick();
+        }
     }
 
     /**
