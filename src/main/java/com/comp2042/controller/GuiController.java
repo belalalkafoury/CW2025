@@ -641,6 +641,20 @@ public class GuiController implements Initializable {
         showFloatingText(scoreText, relativeX, relativeY, Color.YELLOW);
     }
 
+    public void showNewHighScoreAnimation() {
+        if (gameAreaPane == null || groupNotification == null) {
+            return;
+        }
+
+        double boardCenterX = gameAreaPane.getLayoutX() + (gameAreaPane.getWidth() / 2);
+        double boardCenterY = gameAreaPane.getLayoutY() + (gameAreaPane.getHeight() / 2);
+        
+        double relativeX = boardCenterX - groupNotification.getLayoutX();
+        double relativeY = boardCenterY - groupNotification.getLayoutY();
+        
+        showFloatingText("NEW HIGH SCORE!", relativeX, relativeY, Color.GOLD);
+    }
+
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(BrickColorMapper.getFillColor(color));
         rectangle.setArcHeight(GameConstants.ARC_SIZE);
@@ -739,7 +753,9 @@ public class GuiController implements Initializable {
 
         int initialLines = integerProperty.get();
         int initialLevel = (initialLines / 10) + 1;
-        levelLabel.setText(String.valueOf(initialLevel));
+        if (currentGameMode != GameMode.PUZZLE) {
+            levelLabel.setText(String.valueOf(initialLevel));
+        }
         if (animationController != null) {
             animationController.updateSpeed(initialLevel);
         }
@@ -750,7 +766,9 @@ public class GuiController implements Initializable {
             int oldLevel = (oldLines / 10) + 1;
             int newLevel = (newLines / 10) + 1;
             
-            levelLabel.setText(String.valueOf(newLevel));
+            if (currentGameMode != GameMode.PUZZLE) {
+                levelLabel.setText(String.valueOf(newLevel));
+            }
 
             if (animationController != null) {
                 animationController.updateSpeed(newLevel);
@@ -900,22 +918,10 @@ public class GuiController implements Initializable {
                 String playerName = gameController != null ? gameController.getPlayerName() : "GUEST";
                 if (playerName != null && !playerName.equalsIgnoreCase("GUEST")) {
                     highScoreManager.addScore(currentGameMode, playerName, finalScore);
-                    
-                    if (soundController != null) {
-                        HighScoreEntry topEntry = highScoreManager.getHighestScore(currentGameMode);
-                        int currentHighScore = topEntry != null ? topEntry.getScore() : 0;
-                        if (finalScore > currentHighScore) {
-                            soundController.playHighScore();
-                        } else {
-                            soundController.playGameOver();
-                        }
-                    }
-                } else {
-                    if (soundController != null) {
-                        soundController.playGameOver();
-                    }
                 }
-            } else if (soundController != null) {
+            }
+            
+            if (soundController != null) {
                 soundController.playGameOver();
             }
         } catch (NumberFormatException e) {
@@ -1085,6 +1091,14 @@ public class GuiController implements Initializable {
         } else {
             updateHighScoreDisplay("-", 0);
         }
+    }
+
+    public int getCurrentHighScore(GameMode mode) {
+        if (highScoreManager != null && mode != null) {
+            HighScoreEntry topEntry = highScoreManager.getHighestScore(mode);
+            return topEntry != null ? topEntry.getScore() : 0;
+        }
+        return 0;
     }
     
     public void setCurrentGameMode(GameMode gameMode) {

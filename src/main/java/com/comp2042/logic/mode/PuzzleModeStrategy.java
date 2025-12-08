@@ -18,8 +18,8 @@ public class PuzzleModeStrategy implements GameModeStrategy {
     @Override
     public void initialize(Board board, GuiController guiController, SoundController soundController) {
         board.setupPuzzleMode();
-        guiController.configurePuzzleMode(TARGET_LINES);
         guiController.bindLines(board.getScore().linesProperty(), soundController);
+        guiController.configurePuzzleMode(TARGET_LINES);
         guiController.refreshGameBackground(board.getBoardMatrix());
     }
     

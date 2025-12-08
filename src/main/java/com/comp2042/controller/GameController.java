@@ -39,6 +39,7 @@ public class GameController implements InputEventListener {
     private boolean gameWon = false;
     private boolean gameLost = false;
     private String playerName = "GUEST";
+    private boolean highScoreAnimationShown = false;
 
     /**
      * Constructs a GameController with default player name "GUEST".
@@ -86,6 +87,19 @@ public class GameController implements InputEventListener {
         modeStrategy.initialize(board, viewGuiController, soundController);
 
         board.getScore().scoreProperty().addListener((obs, oldVal, newVal) -> {
+            int newScore = newVal.intValue();
+            
+            if (!highScoreAnimationShown && !gameWon && !gameLost) {
+                int currentHighScore = viewGuiController.getCurrentHighScore(gameMode);
+                if (newScore > currentHighScore) {
+                    highScoreAnimationShown = true;
+                    viewGuiController.showNewHighScoreAnimation();
+                    if (soundController != null) {
+                        soundController.playHighScore();
+                    }
+                }
+            }
+            
             if (!gameWon && !gameLost && modeStrategy.checkWinCondition(board, viewGuiController, soundController)) {
                 gameWon = true;
                 modeStrategy.stop();
@@ -271,6 +285,7 @@ public class GameController implements InputEventListener {
         modeStrategy.stop();
         gameWon = false;
         gameLost = false;
+        highScoreAnimationShown = false;
         board.newGame();
         isClearing = false;
         isCountdown = true;
