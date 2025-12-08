@@ -256,16 +256,8 @@ public class GameBoard implements Board {
      */
     @Override
     public void commitClear(ClearRow clearRow) {
-        int[][] newMatrix = clearRow.getNewMatrix();
-        for (int i = 0; i < currentGameMatrix.length; i++) {
-            for (int j = 0; j < currentGameMatrix[i].length; j++) {
-                if (i < newMatrix.length && j < newMatrix[i].length) {
-                    currentGameMatrix[i][j] = newMatrix[i][j];
-                } else {
-                    currentGameMatrix[i][j] = 0;
-                }
-            }
-        }
+        // Use the matrix from ClearRow which already has the correct dimensions
+        currentGameMatrix = clearRow.getNewMatrix();
     }
 
     /**
@@ -281,12 +273,8 @@ public class GameBoard implements Board {
      */
     @Override
     public void newGame() {
+        // new int[width][height] already initializes all elements to 0
         currentGameMatrix = new int[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                currentGameMatrix[i][j] = 0;
-            }
-        }
         score.reset();
         heldBrick = null;
         canHold = true;

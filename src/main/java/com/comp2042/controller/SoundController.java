@@ -1,11 +1,14 @@
 package com.comp2042.controller;
 
+import com.comp2042.util.GameConstants;
 import com.comp2042.util.Logger;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundController {
     private AudioClip moveSound;
@@ -18,6 +21,8 @@ public class SoundController {
     private AudioClip countdownSound;
     
     private MediaPlayer titleMusicPlayer;
+    
+    private final List<AudioClip> soundEffects = new ArrayList<>();
     
     private boolean isMuted = false;
     private double soundVolume = 1.0;
@@ -39,6 +44,16 @@ public class SoundController {
             highScoreSound = loadAudioClip("sounds/highscore.mp3");
             levelUpSound = loadAudioClip("sounds/next-level.mp3");
             countdownSound = loadAudioClip("sounds/countdown.mp3");
+            
+            // Add all sound effects to list for volume management
+            soundEffects.add(moveSound);
+            soundEffects.add(rotateSound);
+            soundEffects.add(hardDropSound);
+            soundEffects.add(lineClearSound);
+            soundEffects.add(gameOverSound);
+            soundEffects.add(highScoreSound);
+            soundEffects.add(levelUpSound);
+            soundEffects.add(countdownSound);
             
             URL titleMusicUrl = getClass().getClassLoader().getResource("sounds/title.mp3");
             if (titleMusicUrl != null) {
@@ -95,8 +110,8 @@ public class SoundController {
 
     public void playComboSound(int combo) {
         if (!isMuted && lineClearSound != null) {
-            double rate = 1.0 + (combo * 0.1);
-            rate = Math.min(rate, 2.0);
+            double rate = GameConstants.BASE_COMBO_RATE + (combo * GameConstants.COMBO_RATE_INCREMENT);
+            rate = Math.min(rate, GameConstants.MAX_COMBO_RATE);
             lineClearSound.setRate(rate);
             lineClearSound.setVolume(soundVolume);
             lineClearSound.play();
@@ -158,19 +173,16 @@ public class SoundController {
     }
 
     public void setSoundVolume(double volume) {
-        this.soundVolume = Math.max(0.0, Math.min(1.0, volume));
-        if (moveSound != null) moveSound.setVolume(soundVolume);
-        if (rotateSound != null) rotateSound.setVolume(soundVolume);
-        if (hardDropSound != null) hardDropSound.setVolume(soundVolume);
-        if (lineClearSound != null) lineClearSound.setVolume(soundVolume);
-        if (gameOverSound != null) gameOverSound.setVolume(soundVolume);
-        if (highScoreSound != null) highScoreSound.setVolume(soundVolume);
-        if (levelUpSound != null) levelUpSound.setVolume(soundVolume);
-        if (countdownSound != null) countdownSound.setVolume(soundVolume);
+        this.soundVolume = Math.max(GameConstants.MIN_VOLUME, Math.min(GameConstants.MAX_VOLUME, volume));
+        for (AudioClip sound : soundEffects) {
+            if (sound != null) {
+                sound.setVolume(soundVolume);
+            }
+        }
     }
 
     public void setMusicVolume(double volume) {
-        this.musicVolume = Math.max(0.0, Math.min(1.0, volume));
+        this.musicVolume = Math.max(GameConstants.MIN_VOLUME, Math.min(GameConstants.MAX_VOLUME, volume));
         if (titleMusicPlayer != null) {
             titleMusicPlayer.setVolume(musicVolume);
         }

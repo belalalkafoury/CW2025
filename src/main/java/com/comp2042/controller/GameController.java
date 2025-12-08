@@ -90,7 +90,7 @@ public class GameController implements InputEventListener {
             initializeTimeAttackMode();
         } else if (gameMode == GameMode.PUZZLE) {
             board.setupPuzzleMode();
-            viewGuiController.configurePuzzleMode(40);
+            viewGuiController.configurePuzzleMode(com.comp2042.util.GameConstants.PUZZLE_MODE_TARGET_LINES);
             viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
             viewGuiController.refreshGameBackground(board.getBoardMatrix());
         } else {
