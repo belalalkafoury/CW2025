@@ -1,6 +1,7 @@
 package com.comp2042.main;
 
 import com.comp2042.controller.MainMenuController;
+import com.comp2042.util.GameConstants;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,7 +27,7 @@ public class Main extends Application {
         controller.setPrimaryStage(primaryStage);
 
         primaryStage.setTitle("TetrisJFX");
-        Scene scene = new Scene(root, 700, 600);
+        Scene scene = new Scene(root, GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

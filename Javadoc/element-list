@@ -3,7 +3,12 @@ com.comp2042.logic.board
 com.comp2042.logic.board.rotation
 com.comp2042.logic.bricks
 com.comp2042.logic.collision
+com.comp2042.logic.mode
 com.comp2042.logic.score
 com.comp2042.main
 com.comp2042.model
+com.comp2042.util
 com.comp2042.view
+com.comp2042.view.animation
+com.comp2042.view.factory
+com.comp2042.view.renderer

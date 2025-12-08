@@ -5,11 +5,10 @@ import com.comp2042.model.Board;
 import com.comp2042.model.GameMode;
 import com.comp2042.logic.board.ClearRow;
 import com.comp2042.logic.board.DownData;
+import com.comp2042.logic.mode.GameModeStrategy;
+import com.comp2042.logic.mode.GameModeStrategyFactory;
+import com.comp2042.logic.mode.TimeAttackModeStrategy;
 import com.comp2042.view.ViewData;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-import java.util.Random;
 
 /**
  * Orchestrates the game loop and coordinates between the board, view, and game logic.
@@ -31,18 +30,16 @@ public class GameController implements InputEventListener {
     private final SoundController soundController;
 
     private final GameMode gameMode;
+    private final GameModeStrategy modeStrategy;
 
     private boolean isClearing = false;
 
     private boolean isCountdown = true;
 
-    private int timeAttackTargetScore;
-    private int timeAttackSecondsRemaining;
-    private Timeline gameTimer;
-    private boolean isTimeAttackActive = false;
     private boolean gameWon = false;
     private boolean gameLost = false;
     private String playerName = "GUEST";
+    private boolean highScoreAnimationShown = false;
 
     /**
      * Constructs a GameController with default player name "GUEST".
@@ -69,6 +66,7 @@ public class GameController implements InputEventListener {
         this.board = board;
         this.soundController = soundController;
         this.gameMode = gameMode;
+        this.modeStrategy = GameModeStrategyFactory.createStrategy(gameMode);
         this.playerName = playerName != null && !playerName.trim().isEmpty() ? playerName.trim().toUpperCase() : "GUEST";
 
         if (soundController != null) {
@@ -86,28 +84,53 @@ public class GameController implements InputEventListener {
         viewGuiController.setAnimationController(this.animationController);
         this.scoreService = new ScoreService(board.getScore());
         
-        if (gameMode == GameMode.TIME_ATTACK) {
-            initializeTimeAttackMode();
-        } else if (gameMode == GameMode.PUZZLE) {
-            board.setupPuzzleMode();
-            viewGuiController.configurePuzzleMode(40);
-            viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        } else {
-            viewGuiController.bindLines(board.getScore().linesProperty(), soundController);
-        }
+        modeStrategy.initialize(board, viewGuiController, soundController);
 
         board.getScore().scoreProperty().addListener((obs, oldVal, newVal) -> {
-            if (isTimeAttackActive && !gameWon && !gameLost) {
-                checkWinCondition(newVal.intValue());
+            int newScore = newVal.intValue();
+            
+            if (!highScoreAnimationShown && !gameWon && !gameLost) {
+                int currentHighScore = viewGuiController.getCurrentHighScore(gameMode);
+                if (newScore > currentHighScore) {
+                    highScoreAnimationShown = true;
+                    viewGuiController.showNewHighScoreAnimation();
+                    if (soundController != null) {
+                        soundController.playHighScore();
+                    }
+                }
+            }
+            
+            if (!gameWon && !gameLost && modeStrategy.checkWinCondition(board, viewGuiController, soundController)) {
+                gameWon = true;
+                modeStrategy.stop();
+                animationController.stop();
+                
+                if (soundController != null) {
+                    soundController.playLevelUp();
+                }
+                
+                viewGuiController.gameWin(soundController);
+            }
+            
+            if (!gameWon && !gameLost && modeStrategy.checkLossCondition(board, viewGuiController, soundController)) {
+                gameLost = true;
+                modeStrategy.stop();
+                animationController.stop();
+                viewGuiController.gameOver(soundController);
             }
         });
 
         board.getScore().linesProperty().addListener((obs, oldVal, newVal) -> {
-            if (gameMode == GameMode.PUZZLE && !gameWon && !gameLost) {
-                if (newVal.intValue() >= 40) {
-                    checkPuzzleWinCondition();
+            if (!gameWon && !gameLost && modeStrategy.checkWinCondition(board, viewGuiController, soundController)) {
+                gameWon = true;
+                modeStrategy.stop();
+                animationController.stop();
+                
+                if (soundController != null) {
+                    soundController.playLevelUp();
                 }
+                
+                viewGuiController.gameWin(soundController);
             }
         });
 
@@ -119,8 +142,9 @@ public class GameController implements InputEventListener {
         viewGuiController.showCountdown(soundController, () -> {
             isCountdown = false;
             animationController.start();
-            if (isTimeAttackActive && gameTimer != null) {
-                gameTimer.play();
+            if (modeStrategy instanceof TimeAttackModeStrategy) {
+                TimeAttackModeStrategy timeAttackStrategy = (TimeAttackModeStrategy) modeStrategy;
+                timeAttackStrategy.startTimer();
             }
         });
     }
@@ -258,21 +282,16 @@ public class GameController implements InputEventListener {
      */
     @Override
     public void createNewGame() {
-        stopGameTimer();
+        modeStrategy.stop();
         gameWon = false;
         gameLost = false;
+        highScoreAnimationShown = false;
         board.newGame();
         isClearing = false;
         isCountdown = true;
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
         
-        if (gameMode == GameMode.TIME_ATTACK) {
-            initializeTimeAttackMode();
-        } else if (gameMode == GameMode.PUZZLE) {
-            board.setupPuzzleMode();
-            viewGuiController.configurePuzzleMode(40);
-            viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        }
+        modeStrategy.reset(board, viewGuiController);
         
         if (soundController != null) {
             soundController.playCountdown();
@@ -280,8 +299,9 @@ public class GameController implements InputEventListener {
         viewGuiController.showCountdown(soundController, () -> {
             isCountdown = false;
             animationController.start();
-            if (isTimeAttackActive && gameTimer != null) {
-                gameTimer.play();
+            if (modeStrategy instanceof TimeAttackModeStrategy) {
+                TimeAttackModeStrategy timeAttackStrategy = (TimeAttackModeStrategy) modeStrategy;
+                timeAttackStrategy.startTimer();
             }
         });
     }
@@ -291,63 +311,83 @@ public class GameController implements InputEventListener {
      * @return ClearRow object containing information about cleared rows
      */
     private ClearRow handleBrickLanding() {
-        ViewData lastBrick = board.getViewData();
-        viewGuiController.hideGhostPiece();
-        
-        board.mergeBrickToBackground();
-        
-        viewGuiController.refreshGameBackground(board.getBoardMatrix());
-        
-        viewGuiController.hideFallingBrick();
-        
+        ViewData lastBrick = mergeBrickToBoard();
         ClearRow result = board.checkClears();
         
         if (result.getLinesRemoved() > 0) {
-            isClearing = true;
-            board.getScore().incrementCombo();
-            int comboValue = board.getScore().getCombo();
-            
-            if (soundController != null) {
-                soundController.playComboSound(comboValue);
-            }
-            
-            if (comboValue >= 2) {
-                viewGuiController.showComboAnimation(comboValue);
-            }
-            
-            viewGuiController.animateClear(result.getClearedIndices(), () -> {
-                board.commitClear(result);
-                int linesRemoved = result.getLinesRemoved();
-                int scoreBonus = 50 * linesRemoved * linesRemoved;
-                scoreService.applyLineClearBonus(result);
-                viewGuiController.showScoreAnimation("+" + scoreBonus);
-                
-                viewGuiController.refreshGameBackground(board.getBoardMatrix());
-                
-                if (!board.createNewBrick()) {
-                    stopGameTimer();
-                    animationController.stop();
-                    viewGuiController.gameOver(soundController);
-                    isClearing = false;
-                } else {
-                    viewGuiController.showFallingBrick();
-                    isClearing = false;
-                }
-            });
+            handleLineClears(result);
         } else {
-            board.getScore().resetCombo();
-            scoreService.applyLineClearBonus(result);
-            if (!board.createNewBrick()) {
-                stopGameTimer();
-                animationController.stop();
-                viewGuiController.gameOver(soundController);
-            } else {
-                viewGuiController.showFallingBrick();
-            }
-            viewGuiController.animatePlacedBlocks(lastBrick);
+            handleNoClears(result, lastBrick);
         }
         
         return result;
+    }
+    
+    /**
+     * Merges the current brick to the board and updates the view.
+     * @return The view data of the brick that was merged
+     */
+    private ViewData mergeBrickToBoard() {
+        ViewData lastBrick = board.getViewData();
+        viewGuiController.hideGhostPiece();
+        board.mergeBrickToBackground();
+        viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        viewGuiController.hideFallingBrick();
+        return lastBrick;
+    }
+    
+    /**
+     * Handles the logic when lines are cleared.
+     * @param result The ClearRow containing information about cleared lines
+     */
+    private void handleLineClears(ClearRow result) {
+        isClearing = true;
+        board.getScore().incrementCombo();
+        int comboValue = board.getScore().getCombo();
+        
+        if (soundController != null) {
+            soundController.playComboSound(comboValue);
+        }
+        
+        if (comboValue >= 2) {
+            viewGuiController.showComboAnimation(comboValue);
+        }
+        
+        viewGuiController.animateClear(result.getClearedIndices(), () -> {
+            board.commitClear(result);
+            int linesRemoved = result.getLinesRemoved();
+            int scoreBonus = 50 * linesRemoved * linesRemoved;
+            scoreService.applyLineClearBonus(result);
+            viewGuiController.showScoreAnimation("+" + scoreBonus);
+            viewGuiController.refreshGameBackground(board.getBoardMatrix());
+            spawnNewBrickOrGameOver();
+            isClearing = false;
+        });
+    }
+    
+    /**
+     * Handles the logic when no lines are cleared.
+     * @param result The ClearRow result (with 0 lines removed)
+     * @param lastBrick The view data of the brick that was placed
+     */
+    private void handleNoClears(ClearRow result, ViewData lastBrick) {
+        board.getScore().resetCombo();
+        scoreService.applyLineClearBonus(result);
+        viewGuiController.animatePlacedBlocks(lastBrick);
+        spawnNewBrickOrGameOver();
+    }
+    
+    /**
+     * Attempts to spawn a new brick or triggers game over if spawning fails.
+     */
+    private void spawnNewBrickOrGameOver() {
+        if (!board.createNewBrick()) {
+            modeStrategy.stop();
+            animationController.stop();
+            viewGuiController.gameOver(soundController);
+        } else {
+            viewGuiController.showFallingBrick();
+        }
     }
 
     /**
@@ -359,111 +399,17 @@ public class GameController implements InputEventListener {
     }
 
     /**
-     * Initializes Time Attack mode with random time limit and target score.
-     * Sets up a timer that counts down and checks win/loss conditions.
-     */
-    private void initializeTimeAttackMode() {
-        isTimeAttackActive = true;
-        Random random = new Random();
-        
-        timeAttackSecondsRemaining = 30 + random.nextInt(91);
-        
-        int pointsPerSecond = 30 + random.nextInt(21);
-        
-        timeAttackTargetScore = timeAttackSecondsRemaining * pointsPerSecond;
-        timeAttackTargetScore = ((timeAttackTargetScore + 50) / 100) * 100;
-        
-        if (timeAttackTargetScore == 0) {
-            timeAttackTargetScore = 100;
-        }
-        
-        viewGuiController.configureTimeAttackMode(timeAttackSecondsRemaining, timeAttackTargetScore);
-        
-        gameTimer = new Timeline(new KeyFrame(
-            Duration.seconds(1),
-            e -> {
-                timeAttackSecondsRemaining--;
-                viewGuiController.updateTimer(timeAttackSecondsRemaining);
-                
-                if (timeAttackSecondsRemaining <= 0) {
-                    checkLossCondition();
-                }
-            }
-        ));
-        gameTimer.setCycleCount(Timeline.INDEFINITE);
-    }
-
-    /**
-     * Checks if the win condition for Time Attack mode has been met.
-     * @param currentScore The current score to check against the target
-     */
-    private void checkWinCondition(int currentScore) {
-        if (currentScore >= timeAttackTargetScore && !gameWon && !gameLost) {
-            gameWon = true;
-            stopGameTimer();
-            animationController.stop();
-            
-            if (soundController != null) {
-                soundController.playLevelUp();
-            }
-            
-            viewGuiController.gameWin(soundController);
-        }
-    }
-
-    /**
-     * Checks if the loss condition for Time Attack mode has been met (time expired).
-     */
-    private void checkLossCondition() {
-        if (timeAttackSecondsRemaining <= 0 && !gameWon && !gameLost) {
-            gameLost = true;
-            stopGameTimer();
-            animationController.stop();
-            viewGuiController.gameOver(soundController);
-        }
-    }
-
-    /**
-     * Checks if the win condition for Puzzle mode has been met (40 lines cleared).
-     */
-    private void checkPuzzleWinCondition() {
-        if (board.getScore().getLinesValue() >= 40 && !gameWon && !gameLost) {
-            gameWon = true;
-            animationController.stop();
-            
-            if (soundController != null) {
-                soundController.playLevelUp();
-            }
-            
-            viewGuiController.gameWin(soundController);
-        }
-    }
-
-    /**
-     * Stops the game timer if it exists.
-     */
-    private void stopGameTimer() {
-        if (gameTimer != null) {
-            gameTimer.stop();
-        }
-    }
-
-    /**
-     * Pauses the Time Attack mode timer.
+     * Pauses the game mode timer.
      */
     public void pauseTimer() {
-        if (gameTimer != null && isTimeAttackActive) {
-            gameTimer.pause();
-        }
+        modeStrategy.pause();
     }
 
     /**
-     * Resumes the Time Attack mode timer.
+     * Resumes the game mode timer.
      */
     public void resumeTimer() {
-        if (gameTimer != null && isTimeAttackActive) {
-            gameTimer.play();
-        }
+        modeStrategy.resume();
     }
 
     /**

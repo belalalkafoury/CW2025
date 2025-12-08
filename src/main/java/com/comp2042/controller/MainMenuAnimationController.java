@@ -2,12 +2,11 @@ package com.comp2042.controller;
 
 import com.comp2042.logic.bricks.Brick;
 import com.comp2042.logic.bricks.BrickFactory;
+import com.comp2042.util.BrickColorMapper;
 import javafx.animation.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.effect.Glow;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -109,7 +108,7 @@ public class MainMenuAnimationController {
         int[] colors = {1, 2, 3, 4, 5, 6, 7};
         int randomColor = colors[random.nextInt(colors.length)];
         
-        rectangle.setFill(getFillColor(randomColor));
+        rectangle.setFill(BrickColorMapper.getFillColor(randomColor));
         rectangle.setArcHeight(9);
         rectangle.setArcWidth(9);
         
@@ -126,7 +125,7 @@ public class MainMenuAnimationController {
             for (int j = 0; j < shape[i].length; j++) {
                 if (shape[i][j] != 0) {
                     Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
-                    rectangle.setFill(getFillColor(shape[i][j]));
+                    rectangle.setFill(BrickColorMapper.getFillColor(shape[i][j]));
                     rectangle.setArcHeight(9);
                     rectangle.setArcWidth(9);
                     gridPane.add(rectangle, j, i);
@@ -135,19 +134,6 @@ public class MainMenuAnimationController {
         }
         
         return gridPane;
-    }
-    
-    private Paint getFillColor(int colorCode) {
-        switch (colorCode) {
-            case 1: return Color.AQUA;
-            case 2: return Color.BLUEVIOLET;
-            case 3: return Color.DARKGREEN;
-            case 4: return Color.YELLOW;
-            case 5: return Color.RED;
-            case 6: return Color.BEIGE;
-            case 7: return Color.BURLYWOOD;
-            default: return Color.TRANSPARENT;
-        }
     }
     
     private void updateAnimations() {

@@ -3,6 +3,7 @@ package com.comp2042.view;
 import com.comp2042.logic.score.HighScoreManager;
 import com.comp2042.model.GameMode;
 import com.comp2042.model.HighScoreEntry;
+import com.comp2042.util.FontLoader;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -53,11 +54,7 @@ public class LeaderboardPanel extends StackPane {
         setPrefWidth(500);
         setPrefHeight(500);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        com.comp2042.util.FontLoader.loadPressStart2P(18);
         
         createContent();
     }

@@ -1,5 +1,7 @@
 package com.comp2042.view;
 
+import com.comp2042.util.FontLoader;
+import com.comp2042.util.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
@@ -9,7 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class HowToPlayPanel extends StackPane {
@@ -20,21 +21,17 @@ public class HowToPlayPanel extends StackPane {
         setPrefWidth(700);
         setPrefHeight(600);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        FontLoader.loadPressStart2P(18);
         
         ImageView imageView = new ImageView();
         try {
-            Image howToPlayImage = new Image(getClass().getClassLoader().getResourceAsStream("How to play.jpg"));
+            Image howToPlayImage = new Image(getClass().getClassLoader().getResourceAsStream("images/How to play.jpg"));
             imageView.setImage(howToPlayImage);
             imageView.setFitWidth(700);
             imageView.setFitHeight(600);
             imageView.setPreserveRatio(false);
         } catch (Exception e) {
-            System.err.println("Could not load How to Play image: " + e.getMessage());
+            Logger.error("Could not load How to Play image: " + e.getMessage());
         }
         
         VBox container = new VBox(20);

@@ -3,6 +3,8 @@ package com.comp2042.view;
 import com.comp2042.controller.SoundController;
 import com.comp2042.logic.score.HighScoreManager;
 import com.comp2042.model.GameSettings;
+import com.comp2042.util.FontLoader;
+import com.comp2042.view.factory.ButtonFactory;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -43,11 +45,7 @@ public class SettingsPanel extends StackPane {
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setPrefSize(400, USE_COMPUTED_SIZE);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        com.comp2042.util.FontLoader.loadPressStart2P(18);
         
         createContent();
     }
@@ -245,42 +243,8 @@ public class SettingsPanel extends StackPane {
     }
 
     private Button createResetButton(String text, Runnable action) {
-        Button button = new Button(text);
         int fontSize = text.contains("HIGH") ? 7 : 10;
-        String style = "-fx-border-width: 2px;" +
-            "-fx-border-color: #FF0000;" +
-            "-fx-border-radius: 6px;" +
-            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-            "-fx-background-radius: 6px;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: " + fontSize + "px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-pref-width: 150px;" +
-            "-fx-pref-height: 35px;" +
-            "-fx-cursor: hand;";
-        button.setStyle(style);
-        button.setOnMouseEntered(e -> {
-            button.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #FF0000;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(255, 0, 0, 0.2);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: " + fontSize + "px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 150px;" +
-                "-fx-pref-height: 35px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        button.setOnMouseExited(e -> {
-            button.setStyle(style);
-        });
-        button.setOnAction(e -> action.run());
-        return button;
+        return com.comp2042.view.factory.ButtonFactory.createRedButton(text, fontSize, action);
     }
 
     private void resetHighScores() {

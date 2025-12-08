@@ -1,5 +1,7 @@
 package com.comp2042.view;
 
+import com.comp2042.util.FontLoader;
+import com.comp2042.view.factory.ButtonFactory;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -12,7 +14,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.util.function.Consumer;
@@ -24,18 +25,14 @@ public class NameEntryPanel extends StackPane {
     private Button guestButton;
     private Button cancelButton;
     private VBox menuPanel;
-    private Consumer<String> onNameEntered;
+    private Consumer<String> onNameEntered;  
     private Runnable onCancel;
 
     public NameEntryPanel() {
         setAlignment(Pos.CENTER);
         setBackground(Background.EMPTY);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        FontLoader.loadPressStart2P(18);
         
         createContent();
     }
@@ -107,157 +104,16 @@ public class NameEntryPanel extends StackPane {
             }
         });
         
-        playButton = new Button("PLAY");
-        playButton.setStyle(
-            "-fx-border-width: 2px;" +
-            "-fx-border-color: #00FFFF;" +
-            "-fx-border-radius: 6px;" +
-            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-            "-fx-background-radius: 6px;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 12px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-pref-width: 200px;" +
-            "-fx-pref-height: 40px;" +
-            "-fx-cursor: hand;"
-        );
-        playButton.setOnMouseEntered(e -> {
-            playButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #00FFFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 255, 255, 0.2);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        playButton.setOnMouseExited(e -> {
-            playButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #00FFFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        playButton.setOnAction(e -> handlePlay());
+        playButton = ButtonFactory.createCyanButton("PLAY", this::handlePlay);
         
-        guestButton = new Button("GUEST");
-        guestButton.setStyle(
-            "-fx-border-width: 2px;" +
-            "-fx-border-color: #00FFFF;" +
-            "-fx-border-radius: 6px;" +
-            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-            "-fx-background-radius: 6px;" +
-            "-fx-text-fill: white;" +
-            "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 12px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-pref-width: 200px;" +
-            "-fx-pref-height: 40px;" +
-            "-fx-cursor: hand;"
-        );
-        guestButton.setOnMouseEntered(e -> {
-            guestButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #00FFFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 255, 255, 0.2);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        guestButton.setOnMouseExited(e -> {
-            guestButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #00FFFF;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        guestButton.setOnAction(e -> {
+        guestButton = ButtonFactory.createCyanButton("GUEST", () -> {
             if (onNameEntered != null) {
                 onNameEntered.accept("GUEST");
             }
             nameField.clear();
         });
         
-        cancelButton = new Button("CANCEL");
-        cancelButton.setStyle(
-            "-fx-border-width: 2px;" +
-            "-fx-border-color: #555555;" +
-            "-fx-border-radius: 6px;" +
-            "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-            "-fx-background-radius: 6px;" +
-            "-fx-text-fill: #AAAAAA;" +
-            "-fx-font-family: \"Press Start 2P\";" +
-            "-fx-font-size: 12px;" +
-            "-fx-font-weight: bold;" +
-            "-fx-pref-width: 200px;" +
-            "-fx-pref-height: 40px;" +
-            "-fx-cursor: hand;"
-        );
-        cancelButton.setOnMouseEntered(e -> {
-            cancelButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #FF0000;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(255, 0, 0, 0.2);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        cancelButton.setOnMouseExited(e -> {
-            cancelButton.setStyle(
-                "-fx-border-width: 2px;" +
-                "-fx-border-color: #555555;" +
-                "-fx-border-radius: 6px;" +
-                "-fx-background-color: rgba(0, 0, 0, 0.8);" +
-                "-fx-background-radius: 6px;" +
-                "-fx-text-fill: #AAAAAA;" +
-                "-fx-font-family: \"Press Start 2P\";" +
-                "-fx-font-size: 12px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-pref-width: 200px;" +
-                "-fx-pref-height: 40px;" +
-                "-fx-cursor: hand;"
-            );
-        });
-        cancelButton.setOnAction(e -> handleCancel());
+        cancelButton = ButtonFactory.createCancelButton("CANCEL", this::handleCancel);
         
         VBox buttonsBox = new VBox(10);
         buttonsBox.setAlignment(Pos.CENTER);

@@ -2,6 +2,7 @@ package com.comp2042.logic.score;
 
 import com.comp2042.model.GameMode;
 import com.comp2042.model.HighScoreEntry;
+import com.comp2042.util.Logger;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -105,12 +106,12 @@ public class HighScoreManager {
                         int score = Integer.parseInt(parts[2]);
                         addScoreInternal(mode, name, score);
                     } catch (IllegalArgumentException e) {
-                        System.err.println("Invalid high score line: " + line);
+                        Logger.warn("Invalid high score line: " + line);
                     }
                 }
             }
         } catch (IOException e) {
-            System.err.println("Failed to load highscores: " + e.getMessage());
+            Logger.error("Failed to load highscores: " + e.getMessage());
         }
     }
 
@@ -138,7 +139,7 @@ public class HighScoreManager {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Failed to save highscores: " + e.getMessage());
+            Logger.error("Failed to save highscores: " + e.getMessage());
         }
     }
 
