@@ -259,3 +259,8 @@ Particles spawned during line clears were not visible due to incorrect coordinat
 
 ### Hard Drop Animation Timing
 Hard drop flash animation was called before the piece locked. Fixed by calling the animation after the board is refreshed.
+
+## License
+
+This project is part of coursework (CW2025).
+
