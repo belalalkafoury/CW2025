@@ -210,12 +210,8 @@ public class GuiController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getClassLoader().getResource("fonts/digital.ttf").toExternalForm(), 38);
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        com.comp2042.util.FontLoader.loadDigital(38);
+        com.comp2042.util.FontLoader.loadPressStart2P(18);
         
         if (backgroundImageView != null && rootPane != null) {
             backgroundImageView.fitWidthProperty().bind(rootPane.widthProperty());
@@ -804,10 +800,9 @@ public class GuiController implements Initializable {
         }
 
         Text textNode = new Text(text);
-        try {
-            Font font = Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 20);
-            textNode.setFont(font);
-        } catch (Exception e) {
+        if (com.comp2042.util.FontLoader.loadPressStart2P(20)) {
+            textNode.setFont(Font.font("Press Start 2P", 20));
+        } else {
             textNode.setFont(Font.font("Arial", 20));
         }
         textNode.setFill(color);

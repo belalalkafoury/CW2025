@@ -3,6 +3,7 @@ package com.comp2042.view;
 import com.comp2042.controller.SoundController;
 import com.comp2042.logic.score.HighScoreManager;
 import com.comp2042.model.GameSettings;
+import com.comp2042.util.FontLoader;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -43,11 +44,7 @@ public class SettingsPanel extends StackPane {
         setMaxSize(USE_PREF_SIZE, USE_PREF_SIZE);
         setPrefSize(400, USE_COMPUTED_SIZE);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        com.comp2042.util.FontLoader.loadPressStart2P(18);
         
         createContent();
     }

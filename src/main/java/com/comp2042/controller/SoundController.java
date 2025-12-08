@@ -1,5 +1,6 @@
 package com.comp2042.controller;
 
+import com.comp2042.util.Logger;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -46,8 +47,7 @@ public class SoundController {
                 titleMusicPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             }
         } catch (Exception e) {
-            System.err.println("Error loading sounds: " + e.getMessage());
-            e.printStackTrace();
+            Logger.error("Error loading sounds: " + e.getMessage(), e);
         }
     }
 
@@ -57,10 +57,10 @@ public class SoundController {
             if (url != null) {
                 return new AudioClip(url.toExternalForm());
             } else {
-                System.err.println("Could not find sound file: " + filename);
+                Logger.warn("Could not find sound file: " + filename);
             }
         } catch (Exception e) {
-            System.err.println("Error loading sound file " + filename + ": " + e.getMessage());
+            Logger.error("Error loading sound file " + filename + ": " + e.getMessage(), e);
         }
         return null;
     }

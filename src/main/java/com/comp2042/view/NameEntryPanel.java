@@ -1,5 +1,6 @@
 package com.comp2042.view;
 
+import com.comp2042.util.FontLoader;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -12,7 +13,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.util.function.Consumer;
@@ -31,11 +31,7 @@ public class NameEntryPanel extends StackPane {
         setAlignment(Pos.CENTER);
         setBackground(Background.EMPTY);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        FontLoader.loadPressStart2P(18);
         
         createContent();
     }

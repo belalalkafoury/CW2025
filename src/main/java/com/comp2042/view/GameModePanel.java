@@ -1,5 +1,7 @@
 package com.comp2042.view;
 
+import com.comp2042.util.FontLoader;
+import com.comp2042.util.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.ScaleTransition;
@@ -15,7 +17,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 public class GameModePanel extends StackPane {
@@ -41,16 +42,12 @@ public class GameModePanel extends StackPane {
             backgroundImageView.setFitHeight(600);
             backgroundImageView.setPreserveRatio(false);
         } catch (Exception e) {
-            System.err.println("Could not load background image: " + e.getMessage());
+            Logger.error("Could not load background image: " + e.getMessage());
         }
         StackPane.setAlignment(backgroundImageView, Pos.CENTER);
         getChildren().add(backgroundImageView);
         
-        try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
-        } catch (Exception e) {
-            System.err.println("Could not load Press Start 2P font: " + e.getMessage());
-        }
+        com.comp2042.util.FontLoader.loadPressStart2P(18);
         
         createContent();
     }
@@ -117,7 +114,7 @@ public class GameModePanel extends StackPane {
             imageView.setPreserveRatio(true);
             imageView.setSmooth(true);
         } catch (Exception e) {
-            System.err.println("Could not load image: " + imagePath + " - " + e.getMessage());
+            Logger.error("Could not load image: " + imagePath + " - " + e.getMessage());
         }
         
         Button button = new Button();

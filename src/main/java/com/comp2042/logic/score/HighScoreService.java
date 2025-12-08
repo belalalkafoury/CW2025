@@ -1,5 +1,6 @@
 package com.comp2042.logic.score;
 
+import com.comp2042.util.Logger;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,7 +46,7 @@ public class HighScoreService {
         try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             writer.write(String.valueOf(highScore));
         } catch (IOException e) {
-            System.err.println("Failed to save highscore: " + e.getMessage());
+            Logger.error("Failed to save highscore: " + e.getMessage());
         }
     }
 
