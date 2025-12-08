@@ -35,7 +35,7 @@ public class GameModePanel extends StackPane {
         
         ImageView backgroundImageView = new ImageView();
         try {
-            Image backgroundImage = new Image(getClass().getClassLoader().getResourceAsStream("background_image.png"));
+            Image backgroundImage = new Image(getClass().getClassLoader().getResourceAsStream("images/background_image.png"));
             backgroundImageView.setImage(backgroundImage);
             backgroundImageView.setFitWidth(700);
             backgroundImageView.setFitHeight(600);
@@ -47,7 +47,7 @@ public class GameModePanel extends StackPane {
         getChildren().add(backgroundImageView);
         
         try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
         } catch (Exception e) {
             System.err.println("Could not load Press Start 2P font: " + e.getMessage());
         }
@@ -66,25 +66,25 @@ public class GameModePanel extends StackPane {
         buttonsContainer.setAlignment(Pos.CENTER);
         buttonsContainer.setFillHeight(false);
         
-        Button classicButton = createImageButton("classicmode.png", () -> {
+        Button classicButton = createImageButton("images/classicmode.png", () -> {
             if (classicAction != null) {
                 classicAction.run();
             }
         });
         
-        Button timeAttackButton = createImageButton("timeattackmode.png", () -> {
+        Button timeAttackButton = createImageButton("images/timeattackmode.png", () -> {
             if (timeAttackAction != null) {
                 timeAttackAction.run();
             }
         });
         
-        Button puzzleButton = createImageButton("puzzlemode.png", () -> {
+        Button puzzleButton = createImageButton("images/puzzlemode.png", () -> {
             if (puzzleAction != null) {
                 puzzleAction.run();
             }
         });
         
-        Button revertedButton = createImageButton("revertedmode.png", () -> {
+        Button revertedButton = createImageButton("images/revertedmode.png", () -> {
             if (revertedAction != null) {
                 revertedAction.run();
             }

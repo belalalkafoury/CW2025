@@ -18,9 +18,9 @@
       xmlns:fx="http://javafx.com/fxml"
       prefWidth="700" prefHeight="600">
 
-    <ImageView fitWidth="700" fitHeight="600" preserveRatio="false" pickOnBounds="true">
+    <ImageView fx:id="backgroundImageView" fitWidth="700" fitHeight="600" preserveRatio="false" pickOnBounds="true">
         <image>
-            <Image url="@background_image.png"/>
+            <Image url="@images/background_image.png"/>
         </image>
     </ImageView>
 
@@ -153,7 +153,7 @@
     </Group>
 
     <stylesheets>
-        <URL value="@window_style.css"/>
+        <URL value="@styles/window_style.css"/>
     </stylesheets>
 
 </Pane>

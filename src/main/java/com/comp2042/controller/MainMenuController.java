@@ -18,6 +18,7 @@ import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -72,6 +73,12 @@ public class MainMenuController implements Initializable {
     @FXML
     private NameEntryPanel nameEntryPanel;
 
+    @FXML
+    private ImageView backgroundImageView;
+
+    @FXML
+    private Pane rootPane;
+
     private Stage primaryStage;
     private MainMenuAnimationController animationController;
     private SoundController soundController;
@@ -83,6 +90,11 @@ public class MainMenuController implements Initializable {
         soundController = new SoundController();
         soundController.playTitleMusic();
         highScoreManager = new HighScoreManager();
+        
+        if (backgroundImageView != null && rootPane != null) {
+            backgroundImageView.fitWidthProperty().bind(rootPane.widthProperty());
+            backgroundImageView.fitHeightProperty().bind(rootPane.heightProperty());
+        }
         
         if (animationContainer != null) {
             animationController = new MainMenuAnimationController(animationContainer);

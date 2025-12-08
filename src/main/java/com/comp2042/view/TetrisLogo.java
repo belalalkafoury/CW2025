@@ -50,7 +50,7 @@ public class TetrisLogo extends HBox {
     private void loadFont() {
         try {
             InputStream fontStream = getClass().getClassLoader()
-                .getResourceAsStream("tetricide-brk/tetri.ttf");
+                .getResourceAsStream("fonts/tetricide-brk/tetri.ttf");
             if (fontStream != null) {
                 tetricideFont = Font.loadFont(fontStream, FONT_SIZE);
                 fontStream.close();

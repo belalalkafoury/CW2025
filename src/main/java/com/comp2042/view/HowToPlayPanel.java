@@ -28,7 +28,7 @@ public class HowToPlayPanel extends StackPane {
         
         ImageView imageView = new ImageView();
         try {
-            Image howToPlayImage = new Image(getClass().getClassLoader().getResourceAsStream("How to play.jpg"));
+            Image howToPlayImage = new Image(getClass().getClassLoader().getResourceAsStream("images/How to play.jpg"));
             imageView.setImage(howToPlayImage);
             imageView.setFitWidth(700);
             imageView.setFitHeight(600);

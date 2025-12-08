@@ -44,7 +44,7 @@ public class SettingsPanel extends StackPane {
         setPrefSize(400, USE_COMPUTED_SIZE);
         
         try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
         } catch (Exception e) {
             System.err.println("Could not load Press Start 2P font: " + e.getMessage());
         }

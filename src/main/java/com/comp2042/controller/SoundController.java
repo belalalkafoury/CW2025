@@ -30,16 +30,16 @@ public class SoundController {
 
     private void loadSounds() {
         try {
-            moveSound = loadAudioClip("brick move.mp3");
-            rotateSound = loadAudioClip("rotate brick.mp3");
-            hardDropSound = loadAudioClip("hard drop.mp3");
-            lineClearSound = loadAudioClip("line clear.mp3");
-            gameOverSound = loadAudioClip("tetris-gb-25-game-over.mp3");
-            highScoreSound = loadAudioClip("highscore.mp3");
-            levelUpSound = loadAudioClip("next-level.mp3");
-            countdownSound = loadAudioClip("countdown.mp3");
+            moveSound = loadAudioClip("sounds/brick move.mp3");
+            rotateSound = loadAudioClip("sounds/rotate brick.mp3");
+            hardDropSound = loadAudioClip("sounds/hard drop.mp3");
+            lineClearSound = loadAudioClip("sounds/line clear.mp3");
+            gameOverSound = loadAudioClip("sounds/tetris-gb-25-game-over.mp3");
+            highScoreSound = loadAudioClip("sounds/highscore.mp3");
+            levelUpSound = loadAudioClip("sounds/next-level.mp3");
+            countdownSound = loadAudioClip("sounds/countdown.mp3");
             
-            URL titleMusicUrl = getClass().getClassLoader().getResource("title.mp3");
+            URL titleMusicUrl = getClass().getClassLoader().getResource("sounds/title.mp3");
             if (titleMusicUrl != null) {
                 Media titleMedia = new Media(titleMusicUrl.toExternalForm());
                 titleMusicPlayer = new MediaPlayer(titleMedia);

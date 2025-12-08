@@ -21,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.input.KeyCode;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -164,6 +165,9 @@ public class GuiController implements Initializable {
     @FXML
     private LeaderboardPanel leaderboardPanel;
 
+    @FXML
+    private ImageView backgroundImageView;
+
     private Rectangle[][] displayMatrix;
 
     private InputEventListener eventListener;
@@ -206,12 +210,18 @@ public class GuiController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        Font.loadFont(getClass().getClassLoader().getResource("fonts/digital.ttf").toExternalForm(), 38);
         try {
-            Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
+            Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 18);
         } catch (Exception e) {
             System.err.println("Could not load Press Start 2P font: " + e.getMessage());
         }
+        
+        if (backgroundImageView != null && rootPane != null) {
+            backgroundImageView.fitWidthProperty().bind(rootPane.widthProperty());
+            backgroundImageView.fitHeightProperty().bind(rootPane.heightProperty());
+        }
+        
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
 
@@ -795,7 +805,7 @@ public class GuiController implements Initializable {
 
         Text textNode = new Text(text);
         try {
-            Font font = Font.loadFont(getClass().getClassLoader().getResourceAsStream("press-start-2p-font/PressStart2P-vaV7.ttf"), 20);
+            Font font = Font.loadFont(getClass().getClassLoader().getResourceAsStream("fonts/press-start-2p-font/PressStart2P-vaV7.ttf"), 20);
             textNode.setFont(font);
         } catch (Exception e) {
             textNode.setFont(Font.font("Arial", 20));
