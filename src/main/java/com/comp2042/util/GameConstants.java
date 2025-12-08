@@ -33,6 +33,27 @@ public final class GameConstants {
     /** Base playback rate for sound effects. */
     public static final double BASE_COMBO_RATE = 1.0;
     
+    /** Brick size in pixels for main game board. */
+    public static final int BRICK_SIZE = 20;
+    
+    /** Brick size in pixels for next piece preview. */
+    public static final int NEXT_PIECE_BRICK_SIZE = 16;
+    
+    /** Gap between cells in pixels. */
+    public static final int CELL_GAP = 1;
+    
+    /** Border offset in pixels. */
+    public static final int BORDER_OFFSET = 8;
+    
+    /** Arc size for rounded rectangles. */
+    public static final int ARC_SIZE = 9;
+    
+    /** Panel X offset in pixels. */
+    public static final int PANEL_OFFSET_X = 12;
+    
+    /** Panel Y offset in pixels. */
+    public static final int PANEL_OFFSET_Y = 42;
+    
     private GameConstants() {
     }
 }

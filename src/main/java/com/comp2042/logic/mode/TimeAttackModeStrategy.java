@@ -58,7 +58,7 @@ public class TimeAttackModeStrategy implements GameModeStrategy {
     
     @Override
     public boolean checkWinCondition(Board board, GuiController guiController, SoundController soundController) {
-        if (board.getScore().getScoreValue() >= targetScore && !gameWon && !gameLost) {
+        if (board.getScore().getValue() >= targetScore && !gameWon && !gameLost) {
             gameWon = true;
             return true;
         }

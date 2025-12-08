@@ -286,9 +286,7 @@ public class GameController implements InputEventListener {
             animationController.start();
             if (modeStrategy instanceof TimeAttackModeStrategy) {
                 TimeAttackModeStrategy timeAttackStrategy = (TimeAttackModeStrategy) modeStrategy;
-                if (timeAttackStrategy.shouldStartTimer()) {
-                    timeAttackStrategy.resume();
-                }
+                timeAttackStrategy.startTimer();
             }
         });
     }

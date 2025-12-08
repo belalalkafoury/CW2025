@@ -1,6 +1,7 @@
 package com.comp2042.view.renderer;
 
 import com.comp2042.util.BrickColorMapper;
+import com.comp2042.util.GameConstants;
 import javafx.scene.Group;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -12,10 +13,6 @@ import javafx.scene.shape.Rectangle;
  * Manages the display matrix and grid visualization.
  */
 public class GameBoardRenderer {
-    
-    private static final int BRICK_SIZE = 20;
-    private static final int CELL_GAP = 1;
-    private static final int ARC_SIZE = 9;
     
     private Rectangle[][] displayMatrix;
     private final GridPane gamePanel;
@@ -42,7 +39,7 @@ public class GameBoardRenderer {
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
         for (int i = 2; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
-                Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
+                Rectangle rectangle = new Rectangle(GameConstants.BRICK_SIZE, GameConstants.BRICK_SIZE);
                 rectangle.setFill(Color.TRANSPARENT);
                 displayMatrix[i][j] = rectangle;
                 gamePanel.add(rectangle, j, i - 2);
@@ -86,7 +83,7 @@ public class GameBoardRenderer {
         
         int rows = boardMatrix.length - 2;
         int cols = boardMatrix[0].length;
-        double cellSize = BRICK_SIZE + CELL_GAP;
+        double cellSize = GameConstants.BRICK_SIZE + GameConstants.CELL_GAP;
         
         for (int i = 0; i <= rows; i++) {
             Line horizontalLine = new Line(0, i * cellSize, cols * cellSize, i * cellSize);
@@ -117,8 +114,8 @@ public class GameBoardRenderer {
     
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(BrickColorMapper.getFillColor(color));
-        rectangle.setArcHeight(ARC_SIZE);
-        rectangle.setArcWidth(ARC_SIZE);
+        rectangle.setArcHeight(GameConstants.ARC_SIZE);
+        rectangle.setArcWidth(GameConstants.ARC_SIZE);
     }
 }
 

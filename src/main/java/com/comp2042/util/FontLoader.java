@@ -1,6 +1,7 @@
 package com.comp2042.util;
 
 import javafx.scene.text.Font;
+import java.io.InputStream;
 
 /**
  * Utility class for loading fonts consistently across the application.
@@ -37,19 +38,22 @@ public final class FontLoader {
     /**
      * Loads the Tetricide font with the specified size.
      * @param size The font size to load
-     * @return true if the font was loaded successfully, false otherwise
+     * @return The loaded Font, or null if loading failed
      */
-    public static boolean loadTetricide(double size) {
+    public static Font loadTetricideFont(double size) {
         try {
-            Font font = Font.loadFont(
-                FontLoader.class.getClassLoader().getResourceAsStream(TETRICIDE_PATH),
-                size
-            );
-            return font != null;
+            InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream(TETRICIDE_PATH);
+            if (fontStream != null) {
+                Font font = Font.loadFont(fontStream, size);
+                fontStream.close();
+                return font;
+            } else {
+                Logger.error("Could not find Tetricide font file: " + TETRICIDE_PATH);
+            }
         } catch (Exception e) {
-            Logger.error("Could not load Tetricide font: " + e.getMessage());
-            return false;
+            Logger.error("Could not load Tetricide font: " + e.getMessage(), e);
         }
+        return Font.font("Arial", size);
     }
     
     /**

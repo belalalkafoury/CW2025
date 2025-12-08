@@ -17,6 +17,7 @@ import com.comp2042.view.renderer.GameBoardRenderer;
 import com.comp2042.view.renderer.GhostPieceRenderer;
 import com.comp2042.view.renderer.NextPieceRenderer;
 import com.comp2042.util.BrickColorMapper;
+import com.comp2042.util.GameConstants;
 import com.comp2042.view.animation.AnimationFactory;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -63,14 +64,6 @@ import java.util.ResourceBundle;
  * Coordinates between the game logic and JavaFX UI components.
  */
 public class GuiController implements Initializable {
-
-    private static final int BRICK_SIZE = 20;
-    private static final int NEXT_PIECE_BRICK_SIZE = 16;
-    private static final int CELL_GAP = 1;
-    private static final int BORDER_OFFSET = 8;
-    private static final int ARC_SIZE = 9;
-    private static final int PANEL_OFFSET_X = 12;
-    private static final int PANEL_OFFSET_Y = 42;
 
     @FXML
     private GridPane gamePanel;
@@ -372,17 +365,17 @@ public class GuiController implements Initializable {
         rectangles = new Rectangle[brick.getBrickData().length][brick.getBrickData()[0].length];
         for (int i = 0; i < brick.getBrickData().length; i++) {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
-                Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
-                rectangle.setArcHeight(ARC_SIZE);
-                rectangle.setArcWidth(ARC_SIZE);
+                Rectangle rectangle = new Rectangle(GameConstants.BRICK_SIZE, GameConstants.BRICK_SIZE);
+                rectangle.setArcHeight(GameConstants.ARC_SIZE);
+                rectangle.setArcWidth(GameConstants.ARC_SIZE);
                 rectangle.setFill(BrickColorMapper.getFillColor(brick.getBrickData()[i][j]));
                 rectangles[i][j] = rectangle;
                 brickPanel.add(rectangle, j, i);
             }
         }
 
-        double cellSize = BRICK_SIZE + CELL_GAP;
-        double borderOffset = BORDER_OFFSET;
+        double cellSize = GameConstants.BRICK_SIZE + GameConstants.CELL_GAP;
+        double borderOffset = GameConstants.BORDER_OFFSET;
         brickPanel.setLayoutX(0);
         brickPanel.setLayoutY(0);
         
@@ -409,8 +402,8 @@ public class GuiController implements Initializable {
      */
     public void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
-            double cellSize = BRICK_SIZE + CELL_GAP;
-            double borderOffset = BORDER_OFFSET;
+            double cellSize = GameConstants.BRICK_SIZE + GameConstants.CELL_GAP;
+            double borderOffset = GameConstants.BORDER_OFFSET;
             
             updateGhostPiece(brick);
             
@@ -526,9 +519,9 @@ public class GuiController implements Initializable {
                     if (rect != null && rect.isVisible() && rect.getOpacity() > 0.1) {
                         Color originalColor = (Color) rect.getFill();
                         
-                        double cellSize = BRICK_SIZE + CELL_GAP;
-                        double blockX = (gameAreaPane != null ? gameAreaPane.getLayoutX() : 250) + BORDER_OFFSET + col * cellSize + cellSize / 2;
-                        double blockY = (gameAreaPane != null ? gameAreaPane.getLayoutY() : 50) + BORDER_OFFSET + (rowIndex - 2) * cellSize + cellSize / 2;
+                        double cellSize = GameConstants.BRICK_SIZE + GameConstants.CELL_GAP;
+                        double blockX = (gameAreaPane != null ? gameAreaPane.getLayoutX() : 250) + GameConstants.BORDER_OFFSET + col * cellSize + cellSize / 2;
+                        double blockY = (gameAreaPane != null ? gameAreaPane.getLayoutY() : 50) + GameConstants.BORDER_OFFSET + (rowIndex - 2) * cellSize + cellSize / 2;
                         
                         int particleCount = 5 + (int)(Math.random() * 6);
                         for (int i = 0; i < particleCount; i++) {
@@ -650,8 +643,8 @@ public class GuiController implements Initializable {
 
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(BrickColorMapper.getFillColor(color));
-        rectangle.setArcHeight(ARC_SIZE);
-        rectangle.setArcWidth(ARC_SIZE);
+        rectangle.setArcHeight(GameConstants.ARC_SIZE);
+        rectangle.setArcWidth(GameConstants.ARC_SIZE);
     }
 
     private Rectangle[][] drawMatrixToGrid(GridPane targetGrid, int[][] matrix, int brickSize) {

@@ -48,11 +48,7 @@ public class TetrisLogo extends HBox {
     }
     
     private void loadFont() {
-        if (com.comp2042.util.FontLoader.loadTetricide(FONT_SIZE)) {
-            tetricideFont = Font.font("Tetricide", FONT_SIZE);
-        } else {
-            tetricideFont = Font.font("Arial", FONT_SIZE);
-        }
+        tetricideFont = com.comp2042.util.FontLoader.loadTetricideFont(FONT_SIZE);
     }
     
     private void createLogo() {

@@ -2,6 +2,7 @@ package com.comp2042.view.renderer;
 
 import com.comp2042.model.Board;
 import com.comp2042.util.BrickColorMapper;
+import com.comp2042.util.GameConstants;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -15,11 +16,6 @@ import java.util.List;
  * Shows where the current piece will land.
  */
 public class GhostPieceRenderer {
-    
-    private static final int BRICK_SIZE = 20;
-    private static final int CELL_GAP = 1;
-    private static final int BORDER_OFFSET = 8;
-    private static final int ARC_SIZE = 9;
     
     private final GridPane ghostPanel;
     private Rectangle[][] ghostRectangles;
@@ -39,10 +35,10 @@ public class GhostPieceRenderer {
         ghostPanel.setVgap(1);
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
-                Rectangle rect = new Rectangle(BRICK_SIZE - 2, BRICK_SIZE - 2);
+                Rectangle rect = new Rectangle(GameConstants.BRICK_SIZE - 2, GameConstants.BRICK_SIZE - 2);
                 rect.setFill(Color.TRANSPARENT);
-                rect.setArcHeight(ARC_SIZE);
-                rect.setArcWidth(ARC_SIZE);
+                rect.setArcHeight(GameConstants.ARC_SIZE);
+                rect.setArcWidth(GameConstants.ARC_SIZE);
                 ghostRectangles[i][j] = rect;
                 ghostPanel.add(rect, j, i);
             }
@@ -97,10 +93,10 @@ public class GhostPieceRenderer {
             initializeGhostPiece(shape);
         }
         
-        double cellSize = BRICK_SIZE + CELL_GAP;
+        double cellSize = GameConstants.BRICK_SIZE + GameConstants.CELL_GAP;
         
-        double ghostStartX = BORDER_OFFSET + currentX * cellSize;
-        double ghostStartY = BORDER_OFFSET + (ghostY - 2) * cellSize;
+        double ghostStartX = GameConstants.BORDER_OFFSET + currentX * cellSize;
+        double ghostStartY = GameConstants.BORDER_OFFSET + (ghostY - 2) * cellSize;
         ghostPanel.setLayoutX(ghostStartX);
         ghostPanel.setLayoutY(ghostStartY);
         

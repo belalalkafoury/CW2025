@@ -1,6 +1,7 @@
 package com.comp2042.view.renderer;
 
 import com.comp2042.util.BrickColorMapper;
+import com.comp2042.util.GameConstants;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Rectangle;
 
@@ -11,9 +12,6 @@ import java.util.List;
  * Manages the display of upcoming pieces and the held piece.
  */
 public class NextPieceRenderer {
-    
-    private static final int NEXT_PIECE_BRICK_SIZE = 16;
-    private static final int ARC_SIZE = 9;
     
     private final GridPane holdPanel;
     private final GridPane nextPiece1;
@@ -39,7 +37,7 @@ public class NextPieceRenderer {
         if (holdPanel == null) {
             return;
         }
-        drawMatrixToGrid(holdPanel, heldBrickData, NEXT_PIECE_BRICK_SIZE);
+        drawMatrixToGrid(holdPanel, heldBrickData, GameConstants.NEXT_PIECE_BRICK_SIZE);
     }
     
     /**
@@ -60,7 +58,7 @@ public class NextPieceRenderer {
             }
             
             int[][] nextBrickData = nextShapes.get(pieceIndex);
-            Rectangle[][] rects = drawMatrixToGrid(grid, nextBrickData, NEXT_PIECE_BRICK_SIZE);
+            Rectangle[][] rects = drawMatrixToGrid(grid, nextBrickData, GameConstants.NEXT_PIECE_BRICK_SIZE);
             
             if (pieceIndex == 0) {
                 nextPiece1Rectangles = rects;
@@ -112,8 +110,8 @@ public class NextPieceRenderer {
     
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(BrickColorMapper.getFillColor(color));
-        rectangle.setArcHeight(ARC_SIZE);
-        rectangle.setArcWidth(ARC_SIZE);
+        rectangle.setArcHeight(GameConstants.ARC_SIZE);
+        rectangle.setArcWidth(GameConstants.ARC_SIZE);
     }
 }
 
